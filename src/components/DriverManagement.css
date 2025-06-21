@@ -1,0 +1,167 @@
+.driver-management {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.form-modal.large {
+  max-width: 1000px;
+  max-height: 95vh;
+}
+
+.driver-form {
+  padding: 1.5rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--yhonk-border);
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--yhonk-black);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--yhonk-red);
+}
+
+.section-title svg {
+  color: var(--yhonk-red);
+}
+
+.drivers-table-container {
+  background-color: var(--yhonk-white);
+  border-radius: 0.75rem;
+  box-shadow: var(--yhonk-shadow);
+  overflow: hidden;
+}
+
+.driver-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.driver-name {
+  font-weight: 600;
+  color: var(--yhonk-black);
+}
+
+.driver-age {
+  font-size: 0.875rem;
+  color: var(--yhonk-gray);
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--yhonk-gray);
+}
+
+.contact-item svg {
+  color: var(--yhonk-red);
+}
+
+.license-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.license-number {
+  font-weight: 500;
+  color: var(--yhonk-black);
+  font-size: 0.875rem;
+}
+
+.license-type {
+  font-size: 0.75rem;
+  color: var(--yhonk-gray);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: var(--yhonk-black);
+}
+
+.rating-stars {
+  color: #fbbf24;
+  font-size: 0.875rem;
+}
+
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.pincode {
+  color: var(--yhonk-gray);
+  font-size: 0.75rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-modal.large {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+  
+  .driver-form {
+    padding: 1rem;
+  }
+  
+  .form-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .table {
+    font-size: 0.875rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem;
+  }
+  
+  .driver-name,
+  .license-number {
+    font-size: 0.875rem;
+  }
+  
+  .contact-item,
+  .license-type,
+  .location-info {
+    font-size: 0.75rem;
+  }
+} 
