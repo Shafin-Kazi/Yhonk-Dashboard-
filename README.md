@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Yhonk Dashboard
 
 A comprehensive React-based admin dashboard for managing vehicles, drivers, and devices with a modern red, white, and black theme.
@@ -201,3 +202,7 @@ This project is licensed under the MIT License.
 ## Support
 
 For support and questions, please contact the development team or create an issue in the repository. 
+=======
+# Yhonk-Dashboard-
+Interactive dashboard built with React.js
+>>>>>>> 9dba280ed26dd0412d944afb2469b14a74a75c6d
