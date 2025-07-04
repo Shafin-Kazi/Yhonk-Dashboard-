@@ -1,33 +1,42 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Car, 
-  Users, 
-  Smartphone, 
-  Search, 
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+} from "react-router-dom";
+import {
+  LayoutDashboard,
+  Car,
+  Users,
+  Smartphone,
+  Search,
   BarChart3,
   Menu,
-  X
-} from 'lucide-react';
-import Dashboard from './components/Dashboard';
-import VehicleManagement from './components/VehicleManagement';
-import DriverManagement from './components/DriverManagement';
-import DeviceManagement from './components/DeviceManagement';
-import './App.css';
+  X,
+  UserCog,
+} from "lucide-react";
+import Dashboard from "./components/Dashboard";
+import VehicleManagement from "./components/VehicleManagement";
+import DriverManagement from "./components/DriverManagement";
+import DeviceManagement from "./components/DeviceManagement";
+import DriverDashboard from "./components/driver-dashboard";
+import "./App.css";
 
 function Sidebar({ isOpen, toggleSidebar }) {
   const location = useLocation();
-  
+
   const menuItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/vehicles', icon: Car, label: 'Manage Vehicles' },
-    { path: '/drivers', icon: Users, label: 'Manage Drivers' },
-    { path: '/devices', icon: Smartphone, label: 'Manage Devices' },
+    { path: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/vehicles", icon: Car, label: "Manage Vehicles" },
+    { path: "/drivers", icon: Users, label: "Manage Drivers" },
+    { path: "/devices", icon: Smartphone, label: "Manage Devices" },
+    { path: "/driver-dashboard", icon: UserCog, label: "Driver Dashboard" },
   ];
 
   return (
-    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+    <div className={`sidebar ${isOpen ? "open" : ""}`}>
       <div className="sidebar-header">
         <h2 className="logo">Yhonk</h2>
         <button className="close-btn" onClick={toggleSidebar}>
@@ -42,7 +51,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
             <Link
               key={item.path}
               to={item.path}
-              className={`nav-item ${isActive ? 'active' : ''}`}
+              className={`nav-item ${isActive ? "active" : ""}`}
               onClick={toggleSidebar}
             >
               <Icon size={20} />
@@ -66,7 +75,7 @@ function App() {
     <Router>
       <div className="app">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        
+
         <div className="main-content">
           <header className="header">
             <button className="menu-btn" onClick={toggleSidebar}>
@@ -89,6 +98,7 @@ function App() {
               <Route path="/vehicles" element={<VehicleManagement />} />
               <Route path="/drivers" element={<DriverManagement />} />
               <Route path="/devices" element={<DeviceManagement />} />
+              <Route path="/driver-dashboard" element={<DriverDashboard />} />
             </Routes>
           </main>
         </div>
@@ -97,4 +107,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
