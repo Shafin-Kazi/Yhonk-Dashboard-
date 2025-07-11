@@ -14,6 +14,8 @@ import Analytics from './components/Analytics';
 import Settings from './components/Settings';
 import LandingPage from './components/LandingPage';
 import DriverDashboard from './components/driver-dashboard';
+import Login from './components/Login';
+import SignUp from './components/Signup';
 import './App.css';
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} /> {/* New Login Route */}
+        <Route path="/signup" element={<SignUp />} />  {/*New Signup route*/}
         <Route
           path="*"
           element={

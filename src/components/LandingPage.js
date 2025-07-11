@@ -8,10 +8,10 @@ export default function LandingPage() {
     <div className="landing-container modern-bg">
       <div className="landing-content fade-in larger">
         <img src="/yhonk_logo.jpg" alt="Yhonk Logo" className="landing-logo" />
-        <h1 className="landing-title">Welcome to Yhonk Dashboard</h1>
+        <h1 className="landing-title">Welcome to YHonk Dashboard</h1>
         <p className="landing-tagline">Smart Vehicle & Driver Monitoring for Safer Roads</p>
         <p className="landing-desc">
-          <b>Yhonk</b> is a next-generation platform designed to revolutionize road safety and fleet management. Monitor vehicles and drivers in real time, analyze horn usage, manage silent zones, and generate insightful reports—all in one powerful, easy-to-use dashboard. Empower your organization to reduce noise pollution, improve compliance, and make data-driven decisions for a safer, smarter future.
+          <b>YHonk</b> is a next-generation platform designed to revolutionize road safety and fleet management. Monitor vehicles and drivers in real time, analyze horn usage, manage silent zones, and generate insightful reports—all in one powerful, easy-to-use dashboard. Empower your organization to reduce noise pollution, improve compliance, and make data-driven decisions for a safer, smarter future.
         </p>
         <div className="landing-btn-group">
           <button
