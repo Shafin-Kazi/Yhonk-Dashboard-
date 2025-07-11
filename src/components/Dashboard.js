@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users, Car, Smartphone, TrendingUp } from 'lucide-react';
+import QuickActions from './QuickActions';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -115,16 +116,8 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="dashboard-section">
-        <h3>Quick Actions</h3>
-        <div className="quick-actions">
-          <button className="btn btn-primary">Add New Vehicle</button>
-          <button className="btn btn-primary">Register Driver</button>
-          <button className="btn btn-primary">Activate Device</button>
-          <button className="btn btn-secondary">Generate Report</button>
-        </div>
-      </div>
+      {/* Quick Actions at the bottom */}
+      <QuickActions />
     </div>
   );
 };

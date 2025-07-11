@@ -1,108 +1,58 @@
-import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useLocation,
-} from "react-router-dom";
-import {
-  LayoutDashboard,
-  Car,
-  Users,
-  Smartphone,
-  Search,
-  BarChart3,
-  Menu,
-  X,
-  UserCog,
-} from "lucide-react";
-import Dashboard from "./components/Dashboard";
-import VehicleManagement from "./components/VehicleManagement";
-import DriverManagement from "./components/DriverManagement";
-import DeviceManagement from "./components/DeviceManagement";
-import DriverDashboard from "./components/driver-dashboard";
-import "./App.css";
-
-function Sidebar({ isOpen, toggleSidebar }) {
-  const location = useLocation();
-
-  const menuItems = [
-    { path: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/vehicles", icon: Car, label: "Manage Vehicles" },
-    { path: "/drivers", icon: Users, label: "Manage Drivers" },
-    { path: "/devices", icon: Smartphone, label: "Manage Devices" },
-    { path: "/driver-dashboard", icon: UserCog, label: "Driver Dashboard" },
-  ];
-
-  return (
-    <div className={`sidebar ${isOpen ? "open" : ""}`}>
-      <div className="sidebar-header">
-        <h2 className="logo">Yhonk</h2>
-        <button className="close-btn" onClick={toggleSidebar}>
-          <X size={20} />
-        </button>
-      </div>
-      <nav className="sidebar-nav">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`nav-item ${isActive ? "active" : ""}`}
-              onClick={toggleSidebar}
-            >
-              <Icon size={20} />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-    </div>
-  );
-}
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
+import VehicleManagement from './components/VehicleManagement';
+import DriverManagement from './components/DriverManagement';
+import DeviceManagement from './components/DeviceManagement';
+import SilentZones from './components/SilentZones';
+import HornDurationReport from './components/reports/HornDurationReport';
+import HornSummaryReport from './components/reports/HornSummaryReport';
+import HornSummaryChart from './components/reports/HornSummaryChart';
+import HornDurationDetail from './components/reports/HornDurationDetail';
+import Analytics from './components/Analytics';
+import Settings from './components/Settings';
+import LandingPage from './components/LandingPage';
+import DriverDashboard from './components/driver-dashboard';
+import './App.css';
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   return (
     <Router>
-      <div className="app">
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-
-        <div className="main-content">
-          <header className="header">
-            <button className="menu-btn" onClick={toggleSidebar}>
-              <Menu size={24} />
-            </button>
-            <div className="header-content">
-              <h1>Yhonk Dashboard</h1>
-              <div className="header-actions">
-                <div className="search-box">
-                  <Search size={16} />
-                  <input type="text" placeholder="Search..." />
-                </div>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="*"
+          element={
+            <div className="app">
+              <Sidebar />
+              <div className="main-content" style={{ marginLeft: '16rem' }}>
+                <header className="header">
+                  <div className="header-content">
+                    <h1>Yhonk Dashboard</h1>
+                  </div>
+                </header>
+                <main className="content">
+                  <Routes>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/vehicles" element={<VehicleManagement />} />
+                    <Route path="/drivers" element={<DriverManagement />} />
+                    <Route path="/devices" element={<DeviceManagement />} />
+                    <Route path="/silent-zones" element={<SilentZones />} />
+                    <Route path="/driver-dashboard" element={<DriverDashboard />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/reports/horn-duration" element={<HornDurationReport />} />
+                    <Route path="/reports/horn-duration/:recordId" element={<HornDurationDetail />} />
+                    <Route path="/reports/horn-summary" element={<HornSummaryReport />} />
+                    <Route path="/reports/horn-chart" element={<HornSummaryChart />} />
+                  </Routes>
+                </main>
               </div>
             </div>
-          </header>
-
-          <main className="content">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/vehicles" element={<VehicleManagement />} />
-              <Route path="/drivers" element={<DriverManagement />} />
-              <Route path="/devices" element={<DeviceManagement />} />
-              <Route path="/driver-dashboard" element={<DriverDashboard />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

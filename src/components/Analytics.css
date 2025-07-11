@@ -1,0 +1,130 @@
+.analytics-container {
+  max-width: 1100px;
+  margin: 2.5rem auto;
+  padding: 0 1rem;
+}
+
+.analytics-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #e11d48;
+  margin-bottom: 2.2rem;
+  letter-spacing: 1px;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.analytics-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 24px rgba(225,29,72,0.08);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heatmap-card h3,
+.drivers-card h3,
+.devices-card h3 {
+  color: #b91c1c;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+.heatmap-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.heatmap-days {
+  display: flex;
+  gap: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+.heatmap-day-label {
+  width: 38px;
+  text-align: center;
+  font-size: 0.98rem;
+  color: #b91c1c;
+  font-weight: 600;
+}
+.heatmap-row {
+  display: flex;
+  gap: 0.2rem;
+}
+.heatmap-cell {
+  width: 38px;
+  height: 38px;
+  border-radius: 0.5rem;
+  background: #ffe4e6;
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+.heatmap-cell:hover {
+  background: #e11d48;
+  color: #fff;
+}
+
+.drivers-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.08rem;
+  color: #222;
+}
+.drivers-list li {
+  margin-bottom: 0.5rem;
+}
+
+.devices-stats {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #e11d48;
+  margin-bottom: 0.7rem;
+}
+.devices-total {
+  font-size: 1.1rem;
+  color: #b91c1c;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+.devices-bar {
+  width: 100%;
+  height: 18px;
+  background: #ffe4e6;
+  border-radius: 0.7rem;
+  margin-top: 0.2rem;
+  overflow: hidden;
+}
+.devices-bar-active {
+  height: 100%;
+  background: linear-gradient(90deg, #e11d48 70%, #fbbf24 100%);
+  border-radius: 0.7rem 0 0 0.7rem;
+  transition: width 0.3s;
+}
+
+@media (max-width: 700px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .analytics-card {
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+  .heatmap-day-label, .heatmap-cell {
+    width: 28px;
+    height: 28px;
+    font-size: 0.95rem;
+  }
+} 

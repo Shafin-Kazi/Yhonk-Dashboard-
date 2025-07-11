@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Smartphone, Plus, Search, Edit, Trash2, X, Activity, Signal, Wifi } from 'lucide-react';
 import './DeviceManagement.css';
+import DeviceInstallationChecklist from './DeviceInstallationChecklist';
 
 const DeviceManagement = () => {
   const [showForm, setShowForm] = useState(false);
@@ -52,6 +53,9 @@ const DeviceManagement = () => {
     yhonkSerialNumber: '',
     description: ''
   });
+
+  const [showChecklist, setShowChecklist] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,8 +110,8 @@ const DeviceManagement = () => {
     <div className="device-management">
       <div className="page-header">
         <div className="header-content">
-          <h2>Manage Devices</h2>
-          <p>Register and manage Yhonk devices</p>
+          <h2 className='subtitle'>Manage Devices</h2>
+          <p className="subtitle">Register and manage Yhonk devices</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(true)}>
           <Plus size={16} />
@@ -292,6 +296,12 @@ const DeviceManagement = () => {
                     <button className="action-btn delete">
                       <Trash2 size={14} />
                     </button>
+                    <button
+                      className="btn btn-red"
+                      onClick={() => { setSelectedDevice(device); setShowChecklist(true); }}
+                    >
+                      Start Installation Checklist
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -363,6 +373,21 @@ const DeviceManagement = () => {
           </table>
         </div>
       </div>
+
+      {/* Checklist Modal */}
+      {showChecklist && (
+        <div className="form-overlay">
+          <div className="form-modal" style={{ maxWidth: 600 }}>
+            <div className="form-header">
+              <h3>Device Installation Checklist</h3>
+              <button className="close-btn" onClick={() => setShowChecklist(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <DeviceInstallationChecklist device={selectedDevice} onClose={() => setShowChecklist(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

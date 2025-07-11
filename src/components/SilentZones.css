@@ -1,0 +1,196 @@
+/* Silent Zones Management Styles - Red & White Theme */
+
+.silentzones-container {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  padding: 2rem 2.5rem;
+  max-width: 100vw;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.silentzones-searchbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+}
+
+.silentzones-searchbar label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #222;
+}
+
+.silentzones-searchbar input,
+.silentzones-searchbar select {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  background: #fff;
+  color: #222;
+  width: 180px;
+}
+
+.silentzones-searchbar input::placeholder {
+  color: #aaa;
+}
+
+.silentzones-searchbar button {
+  font-weight: 600;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.silentzones-searchbar .search-btn,
+.silentzones-searchbar .create-btn {
+  background: #dc2626;
+  color: #fff;
+}
+.silentzones-searchbar .search-btn:hover,
+.silentzones-searchbar .create-btn:hover {
+  background: #b91c1c;
+}
+.silentzones-searchbar .reset-btn {
+  background: #fff;
+  color: #222;
+  border: 1px solid #e5e7eb;
+}
+.silentzones-searchbar .reset-btn:hover {
+  background: #f3f4f6;
+}
+.silentzones-searchbar .create-btn {
+  margin-left: auto;
+  font-weight: bold;
+}
+
+.silentzones-table-container {
+  overflow-x: auto;
+}
+
+.silentzones-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+  background: #fff;
+  color: #222;
+}
+.silentzones-table th,
+.silentzones-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+.silentzones-table th {
+  background: #fff;
+  font-weight: 700;
+  color: #dc2626;
+  border-bottom: 2px solid #dc2626;
+}
+.silentzones-table tr:last-child td {
+  border-bottom: none;
+}
+.silentzones-table .status-label {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.silentzones-table .status-label.active {
+  background: #dc2626;
+  color: #fff;
+}
+.silentzones-table .status-label.inactive {
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+/* Modal Styles */
+.silentzones-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.silentzones-modal {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  padding: 0;
+  color: #222;
+}
+.silentzones-modal .close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #dc2626;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.silentzones-modal .close-btn:hover {
+  color: #b91c1c;
+}
+
+.silentzones-modal form label {
+  color: #222;
+}
+.silentzones-modal form input,
+.silentzones-modal form select {
+  background: #fff;
+  color: #222;
+  border: 1px solid #e5e7eb;
+}
+.silentzones-modal form input::placeholder {
+  color: #aaa;
+}
+.silentzones-modal form button[type="submit"] {
+  background: #dc2626;
+  color: #fff;
+}
+.silentzones-modal form button[type="submit"]:hover {
+  background: #b91c1c;
+}
+.silentzones-modal form button[type="button"] {
+  background: #fff;
+  color: #222;
+  border: 1px solid #e5e7eb;
+}
+.silentzones-modal form button[type="button"]:hover {
+  background: #f3f4f6;
+}
+
+@media (max-width: 700px) {
+  .silentzones-container {
+    padding: 1rem 0.5rem;
+    max-width: 100vw;
+  }
+  .silentzones-searchbar input,
+  .silentzones-searchbar select {
+    width: 100%;
+    min-width: 0;
+  }
+  .silentzones-table th,
+  .silentzones-table td {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.95rem;
+  }
+} 

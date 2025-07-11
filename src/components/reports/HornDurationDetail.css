@@ -1,0 +1,81 @@
+.horn-detail-container {
+  max-width: 900px;
+  margin: 2.5rem auto;
+  padding: 0 1rem;
+}
+
+.horn-detail-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #e11d48;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.horn-detail-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 24px rgba(225,29,72,0.08);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+}
+
+.horn-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.05rem;
+}
+.horn-detail-table th, .horn-detail-table td {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+}
+.horn-detail-table th {
+  color: #b91c1c;
+  font-weight: 700;
+  background: #fff0f3;
+  border-bottom: 2px solid #ffe4e6;
+}
+.horn-detail-table td {
+  border-bottom: 1px solid #f3f4f6;
+  color: #222;
+}
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.9em;
+  border-radius: 1em;
+  font-size: 0.98em;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 0.2em;
+}
+.badge-blue { background: #2563eb; }
+.badge-green { background: #059669; }
+.badge-normal { background: #e11d48; }
+
+.back-btn {
+  background: #fff0f3;
+  color: #e11d48;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-bottom: 1.2rem;
+  transition: background 0.18s;
+}
+.back-btn:hover {
+  background: #ffe4e6;
+}
+
+@media (max-width: 700px) {
+  .horn-detail-card {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+  .horn-detail-title {
+    font-size: 1.3rem;
+  }
+  .horn-detail-table th, .horn-detail-table td {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.97rem;
+  }
+} 

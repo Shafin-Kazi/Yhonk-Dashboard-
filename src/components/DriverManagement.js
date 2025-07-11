@@ -151,8 +151,8 @@ const DriverManagement = () => {
     <div className="driver-management">
       <div className="page-header">
         <div className="header-content">
-          <h2>Manage Drivers</h2>
-          <p>Register and manage driver information</p>
+          <h2 className="subtitle">Manage Drivers</h2>
+          <p className="subtitle">Register and manage driver information</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(true)}>
           <Plus size={16} />

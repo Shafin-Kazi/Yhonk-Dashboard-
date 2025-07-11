@@ -1,0 +1,150 @@
+/* Sidebar Styles for Yhonk Admin Panel */
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 16rem;
+  background: #000;
+  color: #fff;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 40;
+  transition: width 0.2s;
+}
+
+.sidebar.collapsed {
+  width: 4rem;
+}
+
+.sidebar-header {
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-title {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.sidebar-link:hover {
+  background: #fff;
+  color: #e11d48;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.08);
+}
+
+.sidebar-link:hover .sidebar-icon {
+  color: #e11d48;
+}
+
+.sidebar-link.active {
+  background: #fff;
+  color: #dc2626;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.08);
+}
+
+/* Remove custom Reports hover effect */
+
+.sidebar-link .sidebar-icon {
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.sidebar-link.active .sidebar-icon {
+  color: #dc2626;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-top: 1px solid #222;
+  background: #000;
+}
+
+.sidebar-user .user-avatar {
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.sidebar-user .user-name {
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.sidebar-user .logout-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-user .logout-btn:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 4rem;
+  }
+  .sidebar.collapsed {
+    width: 0;
+  }
+  .sidebar-title,
+  .sidebar-link span,
+  .sidebar-user .user-name,
+  .sidebar-user .logout-btn span {
+    display: none;
+  }
+  .sidebar-link {
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+  }
+  .sidebar-user {
+    justify-content: center;
+    padding: 1rem 0.5rem;
+  }
+} 

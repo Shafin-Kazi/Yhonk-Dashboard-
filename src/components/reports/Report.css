@@ -1,0 +1,107 @@
+/* Report.css - shared styles for all report pages */
+
+.report-container {
+  max-width: 1100px;
+  margin: 2.5rem auto 0 auto;
+  padding: 0 1rem;
+}
+
+.report-search-panel {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+  align-items: flex-end;
+}
+
+.report-search-panel label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #222;
+  display: block;
+}
+
+.report-search-panel select,
+.report-search-panel input[type="date"],
+.report-search-panel input[type="text"] {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  width: 180px;
+  background: #fafafa;
+  transition: border 0.2s;
+}
+
+.report-search-panel select:focus,
+.report-search-panel input:focus {
+  border-color: #e11d48;
+  outline: none;
+}
+
+.report-search-panel button {
+  margin-top: 1.5rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+
+.report-search-panel .search-btn {
+  background: #e11d48;
+  color: #fff;
+  border: none;
+}
+
+.report-search-panel .search-btn:hover {
+  background: #b91c1c;
+}
+
+.report-search-panel .reset-btn {
+  background: #fff;
+  color: #e11d48;
+  border: 1.5px solid #e11d48;
+}
+
+.report-search-panel .reset-btn:hover {
+  background: #ffe4e6;
+}
+
+.report-download-area {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.2rem;
+}
+
+.report-download-btn {
+  background: #e11d48;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.report-download-btn:hover {
+  background: #b91c1c;
+}
+
+/* Sub-link active highlight for sidebar (if needed) */
+.sidebar-sublink.active {
+  background: #ffe4e6 !important;
+  color: #e11d48 !important;
+} 
