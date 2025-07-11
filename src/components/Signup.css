@@ -1,0 +1,51 @@
+.signup-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--yhonk-gray-light);
+  padding: 2rem;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 450px;
+  box-shadow: var(--yhonk-shadow-lg);
+}
+
+.signup-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--yhonk-black);
+  text-align: center;
+}
+
+.signup-subtitle {
+  font-size: 0.875rem;
+  color: var(--yhonk-gray);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.signup-footer {
+  text-align: center;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  color: var(--yhonk-gray);
+}
+
+.signup-link {
+  color: var(--yhonk-red);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+.w-full {
+  width: 100%;
+  text-align: center;
+}
