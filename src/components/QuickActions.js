@@ -8,19 +8,19 @@ export default function QuickActions() {
       <div className="quick-actions-row">
         <button
           className="quick-action-btn quick-action-btn-primary"
-          onClick={() => navigate("/vehicles")}
+          onClick={() => navigate("/vehicles?showForm=true")}
         >
           Add New Vehicle
         </button>
         <button
           className="quick-action-btn quick-action-btn-primary"
-          onClick={() => navigate("/drivers")}
+          onClick={() => navigate("/drivers?showForm=true")}
         >
           Register Driver
         </button>
         <button
           className="quick-action-btn quick-action-btn-primary"
-          onClick={() => navigate("/devices")}
+          onClick={() => navigate("/devices?showForm=true")}
         >
           Activate Device
         </button>
