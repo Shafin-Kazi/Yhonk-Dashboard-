@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
 import { Users, Plus, Search, Edit, Trash2, X, Calendar, Phone, Mail, MapPin } from 'lucide-react';
 import { differenceInYears } from 'date-fns';
 import './DriverManagement.css';
@@ -6,6 +7,7 @@ import './DriverManagement.css';
 const DriverManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
   const [drivers, setDrivers] = useState([
     {
       id: 1,
@@ -146,6 +148,13 @@ const DriverManagement = () => {
     driver.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     driver.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // for directly opening the form when clicked on the button from quick action
+    useEffect(() => {
+        if (searchParams.get("showForm") === "true") {
+          setShowForm(true);
+        }
+    }, [searchParams]);
 
   return (
     <div className="driver-management">

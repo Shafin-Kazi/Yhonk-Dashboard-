@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
 import { Smartphone, Plus, Search, Edit, Trash2, X, Activity, Signal, Wifi } from 'lucide-react';
 import './DeviceManagement.css';
 import DeviceInstallationChecklist from './DeviceInstallationChecklist';
@@ -6,6 +7,7 @@ import DeviceInstallationChecklist from './DeviceInstallationChecklist';
 const DeviceManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
   const [devices, setDevices] = useState([
     {
       id: 1,
@@ -105,6 +107,13 @@ const DeviceManagement = () => {
     if (level > 30) return '#d97706';
     return '#dc2626';
   };
+
+  // for directly opening the form when clicked on the button from quick action
+  useEffect(() => {
+    if (searchParams.get("showForm") === "true") {
+      setShowForm(true);
+    }
+  }, [searchParams]);
 
   return (
     <div className="device-management">

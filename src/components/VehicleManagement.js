@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
 import { Car, Plus, Search, Edit, Trash2, X } from 'lucide-react';
 import { differenceInYears } from 'date-fns';
 import './VehicleManagement.css';
@@ -6,6 +7,7 @@ import './VehicleManagement.css';
 const VehicleManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
   const [vehicles, setVehicles] = useState([
     {
       id: 1,
@@ -101,6 +103,13 @@ const VehicleManagement = () => {
     vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vehicle.model.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // for directly opening the form when clicked on the button from quick action
+  useEffect(() => {
+      if (searchParams.get("showForm") === "true") {
+        setShowForm(true);
+      }
+  }, [searchParams]);
 
   return (
     <div className="vehicle-management">
