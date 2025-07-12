@@ -1,38 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Download, Search, RefreshCw, Eye, MapPin } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import './HornDurationReport.css';
 
-const groups = ["Group A", "Group B"];
-const vehicles = { "Group A": ["Vehicle 1", "Vehicle 2"], "Group B": ["Vehicle 3"] };
-const drivers = { "Vehicle 1": ["D001", "D002"], "Vehicle 2": ["D003"], "Vehicle 3": ["D004"] };
+const API_URL = 'http://localhost:5000/api/horn-duration-reports';
+
 const hornTypes = ["Normal", "Long", "Multiple"];
 const durations = ["0–10s", "11–30s", "30+s"];
-
-const mockData = [
-  {
-    id: 1,
-    group: "Group A",
-    vehicle: "Vehicle 1",
-    driver: "D001",
-    imei: "123456789012345\nYHNK-2024-001",
-    hornType: "Normal",
-    hornDuration: 8,
-    hornCount: 2,
-    created: "2024-06-01 10:15:00",
-  },
-  {
-    id: 2,
-    group: "Group B",
-    vehicle: "Vehicle 3",
-    driver: "D004",
-    imei: "987654321098765\nYHNK-2024-003",
-    hornType: "Long",
-    hornDuration: 32,
-    hornCount: 1,
-    created: "2024-06-02 14:22:00",
-  },
-];
 
 export default function HornDurationReport() {
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -43,14 +17,79 @@ export default function HornDurationReport() {
   const [imei, setImei] = useState("");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showDownload, setShowDownload] = useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [groups, setGroups] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [drivers, setDrivers] = useState([]);
 
   // Paging/sorting state (mocked)
   const [page, setPage] = useState(1);
   const totalPages = 2;
-  const [sortBy, setSortBy] = useState("created");
+  const [sortBy, setSortBy] = useState("created_at");
   const [sortDir, setSortDir] = useState("desc");
 
   const navigate = useNavigate();
+
+  const fetchData = () => {
+    setLoading(true);
+    const queryParams = new URLSearchParams();
+    if (selectedGroup) queryParams.append('group', selectedGroup);
+    if (selectedVehicle) queryParams.append('vehicle', selectedVehicle);
+    if (selectedDriver) queryParams.append('driver', selectedDriver);
+    if (selectedHornType) queryParams.append('hornType', selectedHornType);
+    if (selectedDuration) queryParams.append('duration', selectedDuration);
+    if (imei) queryParams.append('imei', imei);
+    if (dateRange.from) queryParams.append('from', dateRange.from);
+    if (dateRange.to) queryParams.append('to', dateRange.to);
+    if (sortBy) queryParams.append('sortBy', sortBy);
+    if (sortDir) queryParams.append('sortDir', sortDir);
+
+    fetch(`${API_URL}?${queryParams.toString()}`)
+      .then(res => res.json())
+      .then(reports => {
+        setData(reports);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch reports');
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/horn-summary-chart/groups`)
+      .then(res => res.json())
+      .then(data => setGroups(data))
+      .catch(() => setError('Failed to fetch groups'));
+  }, []);
+
+  useEffect(() => {
+    if (selectedGroup) {
+      fetch(`http://localhost:5000/api/horn-summary-chart/vehicles?group=${selectedGroup}`)
+        .then(res => res.json())
+        .then(data => setVehicles(data))
+        .catch(() => setError('Failed to fetch vehicles'));
+    } else {
+      setVehicles([]);
+    }
+  }, [selectedGroup]);
+
+  useEffect(() => {
+    if (selectedVehicle) {
+      fetch(`http://localhost:5000/api/horn-summary-chart/drivers?vehicle=${selectedVehicle}`)
+        .then(res => res.json())
+        .then(data => setDrivers(data))
+        .catch(() => setError('Failed to fetch drivers'));
+    } else {
+      setDrivers([]);
+    }
+  }, [selectedVehicle]);
+
+  useEffect(() => {
+    fetchData();
+  }, [sortBy, sortDir]);
 
   return (
     <div className="report-container">
@@ -67,14 +106,14 @@ export default function HornDurationReport() {
           <label>Select Vehicle</label>
           <select value={selectedVehicle} onChange={e => { setSelectedVehicle(e.target.value); setSelectedDriver(""); }} disabled={!selectedGroup}>
             <option value="">All</option>
-            {(vehicles[selectedGroup] || []).map(v => <option key={v}>{v}</option>)}
+            {vehicles.map(v => <option key={v}>{v}</option>)}
           </select>
         </div>
         <div>
           <label>Select Driver Serial Number</label>
           <select value={selectedDriver} onChange={e => setSelectedDriver(e.target.value)} disabled={!selectedVehicle}>
             <option value="">All</option>
-            {(drivers[selectedVehicle] || []).map(d => <option key={d}>{d}</option>)}
+            {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         </div>
         <div>
@@ -103,7 +142,7 @@ export default function HornDurationReport() {
           <label>IMEI</label>
           <input value={imei} onChange={e => setImei(e.target.value)} placeholder="IMEI" />
         </div>
-        <button className="search-btn">
+        <button className="search-btn" onClick={fetchData}>
           <Search size={16}/> Search
         </button>
         <button className="reset-btn" style={{marginTop: 24}}>
@@ -141,15 +180,15 @@ export default function HornDurationReport() {
             </tr>
           </thead>
           <tbody>
-            {mockData.map(row => (
+            {data.map(row => (
               <tr key={row.id}>
-                <td>{row.group}</td>
+                <td>{row.group_name}</td>
                 <td><div>{row.vehicle}</div><div className="cell-sub">{row.driver}</div></td>
-                <td><div>{row.imei.split("\n")[0]}</div><div className="cell-sub">{row.imei.split("\n")[1]}</div></td>
-                <td><span className={`badge badge-${row.hornType.toLowerCase()}`}>{row.hornType}</span></td>
-                <td>{row.hornDuration}</td>
-                <td>{row.hornCount}</td>
-                <td>{row.created}</td>
+                <td><div>{row.imei}</div></td>
+                <td><span className={`badge badge-${row.horn_type.toLowerCase()}`}>{row.horn_type}</span></td>
+                <td>{row.horn_duration}</td>
+                <td>{row.horn_count}</td>
+                <td>{new Date(row.created_at).toLocaleString()}</td>
                 <td>
                   <button className="action-btn" title="View Details" onClick={() => navigate(`/reports/horn-duration/${row.id}`)}><Eye size={18}/></button>
                   <button className="action-btn" title="Open Map"><MapPin size={18}/></button>
@@ -167,4 +206,4 @@ export default function HornDurationReport() {
       </div>
     </div>
   );
-} 
+}

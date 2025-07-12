@@ -1,70 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Users, Car, Smartphone, TrendingUp } from 'lucide-react';
 import QuickActions from './QuickActions';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const stats = [
-    {
-      title: 'Total Users',
-      value: '1,234',
-      change: '+12%',
-      icon: Users,
-      color: 'blue'
-    },
-    {
-      title: 'Total Vehicles',
-      value: '567',
-      change: '+8%',
-      icon: Car,
-      color: 'green'
-    },
-    {
-      title: 'Total Drivers',
-      value: '890',
-      change: '+15%',
-      icon: Users,
-      color: 'purple'
-    },
-    {
-      title: 'Total Devices',
-      value: '1,456',
-      change: '+23%',
-      icon: Smartphone,
-      color: 'orange'
-    }
-  ];
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalVehicles: 0,
+    totalDrivers: 0,
+    totalDevices: 0,
+    changeUsers: '',
+    changeVehicles: '',
+    changeDrivers: '',
+    changeDevices: ''
+  });
 
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'vehicle',
-      action: 'New vehicle registered',
-      details: 'Toyota Camry - MH12AB1234',
-      time: '2 hours ago'
-    },
-    {
-      id: 2,
-      type: 'driver',
-      action: 'Driver profile updated',
-      details: 'John Doe - License renewed',
-      time: '4 hours ago'
-    },
-    {
-      id: 3,
-      type: 'device',
-      action: 'Device activated',
-      details: 'IMEI: 123456789012345',
-      time: '6 hours ago'
-    },
-    {
-      id: 4,
-      type: 'vehicle',
-      action: 'Vehicle maintenance due',
-      details: 'Honda City - Service reminder',
-      time: '1 day ago'
-    }
-  ];
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/dashboard/stats')
+      .then(res => res.json())
+      .then(data => setStats({
+        totalUsers: data.totalUsers || 0,
+        totalVehicles: data.totalVehicles || 0,
+        totalDrivers: data.totalDrivers || 0,
+        totalDevices: data.totalDevices || 0,
+        changeUsers: data.changeUsers || '',
+        changeVehicles: data.changeVehicles || '',
+        changeDrivers: data.changeDrivers || '',
+        changeDevices: data.changeDevices || ''
+      }));
+
+    fetch('http://localhost:5000/api/dashboard/activities')
+      .then(res => res.json())
+      .then(data => setRecentActivities(Array.isArray(data) ? data : [])); // <-- fix here
+  }, []);
 
   return (
     <div className="dashboard">
@@ -75,24 +45,58 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <div className="stats-grid">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div key={index} className={`stat-card ${stat.color}`}>
-              <div className="stat-icon">
-                <Icon size={24} />
-              </div>
-              <div className="stat-content">
-                <h3>{stat.title}</h3>
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-change">
-                  <TrendingUp size={16} />
-                  <span>{stat.change}</span>
-                </div>
-              </div>
+        <div className="stat-card blue">
+          <div className="stat-icon">
+            <Users size={24} />
+          </div>
+          <div className="stat-content">
+            <h3>Total Users</h3>
+            <div className="stat-value">{stats.totalUsers}</div>
+            <div className="stat-change">
+              <TrendingUp size={16} />
+              <span>{stats.changeUsers}</span>
             </div>
-          );
-        })}
+          </div>
+        </div>
+        <div className="stat-card green">
+          <div className="stat-icon">
+            <Car size={24} />
+          </div>
+          <div className="stat-content">
+            <h3>Total Vehicles</h3>
+            <div className="stat-value">{stats.totalVehicles}</div>
+            <div className="stat-change">
+              <TrendingUp size={16} />
+              <span>{stats.changeVehicles}</span>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card purple">
+          <div className="stat-icon">
+            <Users size={24} />
+          </div>
+          <div className="stat-content">
+            <h3>Total Drivers</h3>
+            <div className="stat-value">{stats.totalDrivers}</div>
+            <div className="stat-change">
+              <TrendingUp size={16} />
+              <span>{stats.changeDrivers}</span>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card orange">
+          <div className="stat-icon">
+            <Smartphone size={24} />
+          </div>
+          <div className="stat-content">
+            <h3>Total Devices</h3>
+            <div className="stat-value">{stats.totalDevices}</div>
+            <div className="stat-change">
+              <TrendingUp size={16} />
+              <span>{stats.changeDevices}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Recent Activities */}
