@@ -1,26 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Analytics.css';
 
-// Mock data for heatmap (vehicles registered per day)
-const heatmapData = [
-  [2, 3, 1, 0, 4, 5, 2],
-  [1, 2, 3, 2, 1, 0, 4],
-  [0, 1, 2, 3, 4, 2, 1],
-  [3, 2, 1, 4, 5, 3, 2],
-];
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const driversInfo = {
-  total: 128,
-  active: 112,
-  inactive: 16,
-  newThisMonth: 9,
-};
-
-const activeDevices = 97;
-const totalDevices = 110;
-
 export default function Analytics() {
+  const [heatmapData, setHeatmapData] = useState([]);
+  const [driversInfo, setDriversInfo] = useState({
+    total: 0,
+    active: 0,
+    inactive: 0,
+    newThisMonth: 0,
+  });
+  const [devicesInfo, setDevicesInfo] = useState({
+    activeDevices: 0,
+    totalDevices: 0,
+  });
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const heatmapRes = await fetch('http://localhost:5000/api/analytics/vehicles-heatmap');
+        const heatmap = await heatmapRes.json();
+        setHeatmapData(heatmap.heatmap);
+
+        const driversRes = await fetch('http://localhost:5000/api/analytics/drivers-info');
+        const drivers = await driversRes.json();
+        setDriversInfo(drivers);
+
+        const devicesRes = await fetch('http://localhost:5000/api/analytics/devices-info');
+        const devices = await devicesRes.json();
+        setDevicesInfo(devices);
+      } catch (err) {
+        console.error("Error fetching analytics data:", err);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="analytics-container">
       <h2 className="analytics-title">Analytics Dashboard</h2>
@@ -63,13 +79,13 @@ export default function Analytics() {
         <div className="analytics-card devices-card">
           <h3>Active Devices</h3>
           <div className="devices-stats">
-            <span className="devices-active">{activeDevices}</span>
-            <span className="devices-total">/ {totalDevices} total</span>
+            <span className="devices-active">{devicesInfo.activeDevices}</span>
+            <span className="devices-total">/ {devicesInfo.totalDevices} total</span>
           </div>
           <div className="devices-bar">
             <div
               className="devices-bar-active"
-              style={{ width: `${(activeDevices / totalDevices) * 100}%` }}
+              style={{ width: `${(devicesInfo.activeDevices / devicesInfo.totalDevices) * 100}%` }}
             />
           </div>
         </div>

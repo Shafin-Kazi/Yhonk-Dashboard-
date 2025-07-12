@@ -4,42 +4,15 @@ import { Users, Plus, Search, Edit, Trash2, X, Calendar, Phone, Mail, MapPin } f
 import { differenceInYears } from 'date-fns';
 import './DriverManagement.css';
 
+const API_URL = 'http://localhost:5000/api/drivers';
+
 const DriverManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
-  const [drivers, setDrivers] = useState([
-    {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      dateOfBirth: '1985-06-15',
-      email: 'john.doe@email.com',
-      preferredLanguage: 'English',
-      phoneNumber: '+91 98765 43210',
-      experience: 8,
-      age: 38,
-      gender: 'Male',
-      occupation: 'Professional Driver',
-      driverRating: 4.5,
-      rightEarAudiogram: 25,
-      leftEarAudiogram: 30,
-      signalToNoise: 15,
-      personalHearingIntelligence: 'Good',
-      education: 'High School',
-      income: '50000-75000',
-      disability: 'None',
-      maritalStatus: 'Married',
-      aadharNumber: '1234-5678-9012',
-      licenseNumber: 'DL-0120140149649',
-      licenseType: 'Heavy Vehicle',
-      dateOfLicenseIssue: '2015-03-20',
-      country: 'India',
-      state: 'Maharashtra',
-      city: 'Mumbai',
-      pincode: '400001'
-    }
-  ]);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -67,8 +40,11 @@ const DriverManagement = () => {
     country: '',
     state: '',
     city: '',
-    pincode: ''
+    pincode: '',
+    age: ''
   });
+
+  const [editId, setEditId] = useState(null);
 
   const languages = ['English', 'Hindi', 'Marathi', 'Gujarati', 'Tamil', 'Telugu', 'Kannada', 'Malayalam'];
   const genders = ['Male', 'Female', 'Other'];
@@ -104,57 +80,205 @@ const DriverManagement = () => {
     }
   };
 
+  // Fetch drivers from backend
+  useEffect(() => {
+    setLoading(true);
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        // Map backend fields to frontend fields if needed
+        const mapped = data.map(driver => ({
+          id: driver.id,
+          firstName: driver.name ? driver.name.split(' ')[0] : '',
+          lastName: driver.name ? driver.name.split(' ').slice(1).join(' ') : '',
+          dateOfBirth: driver.date_of_birth,
+          email: driver.email,
+          preferredLanguage: driver.preferred_language,
+          phoneNumber: driver.phone,
+          experience: driver.experience,
+          age: calculateAge(driver.date_of_birth),
+          gender: driver.gender,
+          occupation: driver.occupation,
+          driverRating: driver.driver_rating,
+          rightEarAudiogram: driver.right_ear_audiogram,
+          leftEarAudiogram: driver.left_ear_audiogram,
+          signalToNoise: driver.signal_to_noise,
+          personalHearingIntelligence: driver.personal_hearing_intelligence,
+          education: driver.education,
+          income: driver.income,
+          disability: driver.disability,
+          maritalStatus: driver.marital_status,
+          aadharNumber: driver.aadhar_number,
+          licenseNumber: driver.license_number,
+          licenseType: driver.license_type,
+          dateOfLicenseIssue: driver.date_of_license_issue,
+          country: driver.country,
+          state: driver.state,
+          city: driver.city,
+          pincode: driver.pincode
+        }));
+        setDrivers(mapped);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch drivers');
+        setLoading(false);
+      });
+  }, []);
+
+  const handleEdit = (driver) => {
+    setEditId(driver.id);
+    setFormData({
+      ...driver
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this driver?')) return;
+    try {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      setDrivers(prev => prev.filter(d => d.id !== id));
+    } catch {
+      setError('Failed to delete driver');
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newDriver = {
-      id: Date.now(),
-      ...formData,
-      age: calculateAge(formData.dateOfBirth)
+      name: `${formData.firstName} ${formData.lastName}`,
+      date_of_birth: formData.dateOfBirth,
+      email: formData.email,
+      preferred_language: formData.preferredLanguage,
+      phone: formData.phoneNumber,
+      experience: formData.experience,
+      gender: formData.gender,
+      occupation: formData.occupation,
+      driver_rating: formData.driverRating,
+      right_ear_audiogram: formData.rightEarAudiogram,
+      left_ear_audiogram: formData.leftEarAudiogram,
+      signal_to_noise: formData.signalToNoise,
+      personal_hearing_intelligence: formData.personalHearingIntelligence,
+      education: formData.education,
+      income: formData.income,
+      disability: formData.disability,
+      marital_status: formData.maritalStatus,
+      aadhar_number: formData.aadharNumber,
+      license_number: formData.licenseNumber,
+      license_type: formData.licenseType,
+      date_of_license_issue: formData.dateOfLicenseIssue,
+      country: formData.country,
+      state: formData.state,
+      city: formData.city,
+      pincode: formData.pincode,
+      status: 'Active'
     };
-    setDrivers(prev => [...prev, newDriver]);
-    setFormData({
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      email: '',
-      preferredLanguage: '',
-      phoneNumber: '',
-      experience: '',
-      gender: '',
-      occupation: '',
-      driverRating: '',
-      rightEarAudiogram: '',
-      leftEarAudiogram: '',
-      signalToNoise: '',
-      personalHearingIntelligence: '',
-      education: '',
-      income: '',
-      disability: '',
-      maritalStatus: '',
-      aadharNumber: '',
-      licenseNumber: '',
-      licenseType: '',
-      dateOfLicenseIssue: '',
-      country: '',
-      state: '',
-      city: '',
-      pincode: ''
-    });
-    setShowForm(false);
+    if (editId) {
+      fetch(`${API_URL}/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDriver)
+      })
+        .then(res => res.json())
+        .then(data => {
+          setDrivers(prev => prev.map(d => d.id === editId ? { ...d, ...formData, age: calculateAge(formData.dateOfBirth) } : d));
+          setEditId(null);
+          setFormData({
+            firstName: '',
+            lastName: '',
+            dateOfBirth: '',
+            email: '',
+            preferredLanguage: '',
+            phoneNumber: '',
+            experience: '',
+            gender: '',
+            occupation: '',
+            driverRating: '',
+            rightEarAudiogram: '',
+            leftEarAudiogram: '',
+            signalToNoise: '',
+            personalHearingIntelligence: '',
+            education: '',
+            income: '',
+            disability: '',
+            maritalStatus: '',
+            aadharNumber: '',
+            licenseNumber: '',
+            licenseType: '',
+            dateOfLicenseIssue: '',
+            country: '',
+            state: '',
+            city: '',
+            pincode: '',
+            age: ''
+          });
+          setShowForm(false);
+        })
+        .catch(() => setError('Failed to update driver'));
+    } else {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDriver)
+      })
+        .then(res => res.json())
+        .then(data => {
+          setDrivers(prev => [
+            ...prev,
+            {
+              id: data.id,
+              ...formData,
+              age: calculateAge(formData.dateOfBirth)
+            }
+          ]);
+          setFormData({
+            firstName: '',
+            lastName: '',
+            dateOfBirth: '',
+            email: '',
+            preferredLanguage: '',
+            phoneNumber: '',
+            experience: '',
+            gender: '',
+            occupation: '',
+            driverRating: '',
+            rightEarAudiogram: '',
+            leftEarAudiogram: '',
+            signalToNoise: '',
+            personalHearingIntelligence: '',
+            education: '',
+            income: '',
+            disability: '',
+            maritalStatus: '',
+            aadharNumber: '',
+            licenseNumber: '',
+            licenseType: '',
+            dateOfLicenseIssue: '',
+            country: '',
+            state: '',
+            city: '',
+            pincode: '',
+            age: ''
+          });
+          setShowForm(false);
+        })
+        .catch(() => setError('Failed to add driver'));
+    }
   };
 
   const filteredDrivers = drivers.filter(driver =>
-    driver.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    driver.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    driver.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    (driver.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (driver.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (driver.licenseNumber || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // for directly opening the form when clicked on the button from quick action
-    useEffect(() => {
-        if (searchParams.get("showForm") === "true") {
-          setShowForm(true);
-        }
-    }, [searchParams]);
+  useEffect(() => {
+    if (searchParams.get("showForm") === "true") {
+      setShowForm(true);
+    }
+  }, [searchParams]);
 
   return (
     <div className="driver-management">
@@ -163,7 +287,7 @@ const DriverManagement = () => {
           <h2 className="subtitle">Manage Drivers</h2>
           <p className="subtitle">Register and manage driver information</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+        <button className="btn btn-primary" onClick={() => { setShowForm(true); setEditId(null); }}>
           <Plus size={16} />
           Add Driver
         </button>
@@ -201,8 +325,8 @@ const DriverManagement = () => {
         <div className="form-overlay">
           <div className="form-modal large">
             <div className="form-header">
-              <h3>Add New Driver</h3>
-              <button className="close-btn" onClick={() => setShowForm(false)}>
+              <h3>{editId ? "Edit Driver" : "Add New Driver"}</h3>
+              <button className="close-btn" onClick={() => { setShowForm(false); setEditId(null); }}>
                 <X size={20} />
               </button>
             </div>
@@ -610,11 +734,11 @@ const DriverManagement = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowForm(false); setEditId(null); }}>
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Add Driver
+                  {editId ? "Update Driver" : "Add Driver"}
                 </button>
               </div>
             </form>
@@ -624,79 +748,85 @@ const DriverManagement = () => {
 
       {/* Drivers Table */}
       <div className="drivers-table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Driver</th>
-              <th>Contact</th>
-              <th>License</th>
-              <th>Experience</th>
-              <th>Rating</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDrivers.map(driver => (
-              <tr key={driver.id}>
-                <td>
-                  <div className="driver-info">
-                    <div className="driver-name">{driver.firstName} {driver.lastName}</div>
-                    <div className="driver-age">{driver.age} years, {driver.gender}</div>
-                  </div>
-                </td>
-                <td>
-                  <div className="contact-info">
-                    <div className="contact-item">
-                      <Mail size={12} />
-                      <span>{driver.email}</span>
-                    </div>
-                    <div className="contact-item">
-                      <Phone size={12} />
-                      <span>{driver.phoneNumber}</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="license-info">
-                    <div className="license-number">{driver.licenseNumber}</div>
-                    <div className="license-type">{driver.licenseType}</div>
-                  </div>
-                </td>
-                <td>{driver.experience} years</td>
-                <td>
-                  <div className="rating">
-                    <span className="rating-value">{driver.driverRating}</span>
-                    <span className="rating-stars">★★★★☆</span>
-                  </div>
-                </td>
-                <td>
-                  <div className="location-info">
-                    <div>{driver.city}, {driver.state}</div>
-                    <div className="pincode">{driver.pincode}</div>
-                  </div>
-                </td>
-                <td>
-                  <span className="badge badge-success">Active</span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button className="action-btn edit">
-                      <Edit size={14} />
-                    </button>
-                    <button className="action-btn delete">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
+        {loading ? (
+          <div>Loading drivers...</div>
+        ) : error ? (
+          <div style={{ color: 'red' }}>{error}</div>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Contact</th>
+                <th>License</th>
+                <th>Experience</th>
+                <th>Rating</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredDrivers.map(driver => (
+                <tr key={driver.id}>
+                  <td>
+                    <div className="driver-info">
+                      <div className="driver-name">{driver.firstName} {driver.lastName}</div>
+                      <div className="driver-age">{driver.age} years, {driver.gender}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="contact-info">
+                      <div className="contact-item">
+                        <Mail size={12} />
+                        <span>{driver.email}</span>
+                      </div>
+                      <div className="contact-item">
+                        <Phone size={12} />
+                        <span>{driver.phoneNumber}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="license-info">
+                      <div className="license-number">{driver.licenseNumber}</div>
+                      <div className="license-type">{driver.licenseType}</div>
+                    </div>
+                  </td>
+                  <td>{driver.experience} years</td>
+                  <td>
+                    <div className="rating">
+                      <span className="rating-value">{driver.driverRating}</span>
+                      <span className="rating-stars">★★★★☆</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="location-info">
+                      <div>{driver.city}, {driver.state}</div>
+                      <div className="pincode">{driver.pincode}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="badge badge-success">Active</span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="action-btn edit" onClick={() => handleEdit(driver)}>
+                        <Edit size={14} />
+                      </button>
+                      <button className="action-btn delete" onClick={() => handleDelete(driver.id)}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 };
 
-export default DriverManagement; 
+export default DriverManagement;

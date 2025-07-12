@@ -1,53 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
-import { Smartphone, Plus, Search, Edit, Trash2, X, Activity, Signal, Wifi } from 'lucide-react';
+import { Smartphone, Plus, Search, Edit, Trash2, X, Activity, Signal } from 'lucide-react';
 import './DeviceManagement.css';
 import DeviceInstallationChecklist from './DeviceInstallationChecklist';
+
+const API_URL = 'http://localhost:5000/api/devices';
 
 const DeviceManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
-  const [devices, setDevices] = useState([
-    {
-      id: 1,
-      imeiNumber: '123456789012345',
-      simNumber: '+91 98765 43210',
-      yhonkSerialNumber: 'YHNK-2024-001',
-      description: 'GPS Tracking Device for Vehicle Fleet',
-      status: 'Active',
-      lastSeen: '2024-01-15 14:30:00',
-      batteryLevel: 85,
-      signalStrength: 'Strong'
-    }
-  ]);
+  const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [deviceLogs, setDeviceLogs] = useState([
-    {
-      id: 1,
-      deviceId: 1,
-      timestamp: '2024-01-15 14:30:00',
-      event: 'Location Update',
-      details: 'Lat: 19.0760, Long: 72.8777',
-      status: 'Success'
-    },
-    {
-      id: 2,
-      deviceId: 1,
-      timestamp: '2024-01-15 14:25:00',
-      event: 'Battery Check',
-      details: 'Battery Level: 85%',
-      status: 'Success'
-    },
-    {
-      id: 3,
-      deviceId: 1,
-      timestamp: '2024-01-15 14:20:00',
-      event: 'Signal Test',
-      details: 'Signal Strength: Strong',
-      status: 'Success'
-    }
-  ]);
+  const [deviceLogs, setDeviceLogs] = useState([]);
+  const [logFilters, setLogFilters] = useState({ event: '', status: '' });
+  const [deviceFilters, setDeviceFilters] = useState({ status: '', signalStrength: '' });
 
   const [formData, setFormData] = useState({
     imeiNumber: '',
@@ -56,6 +25,7 @@ const DeviceManagement = () => {
     description: ''
   });
 
+  const [editId, setEditId] = useState(null);
   const [showChecklist, setShowChecklist] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
 
@@ -67,31 +37,148 @@ const DeviceManagement = () => {
     }));
   };
 
+  // Fetch devices and logs from backend
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      fetch(API_URL).then(res => res.json()),
+      fetch('http://localhost:5000/api/device-logs').then(res => res.json())
+    ])
+    .then(([devicesData, logsData]) => {
+      const mappedDevices = devicesData.map(device => ({
+        id: device.id,
+        imeiNumber: device.imei_number || '',
+        simNumber: device.sim_number || '',
+        yhonkSerialNumber: device.serial_number || '',
+        description: device.description || '',
+        status: device.status || 'Active',
+        lastSeen: device.last_seen || '',
+        batteryLevel: device.battery_level || 100,
+        signalStrength: device.signal_strength || 'Strong'
+      }));
+      setDevices(mappedDevices);
+
+      const mappedLogs = logsData.map(log => ({
+        id: log.id,
+        deviceId: log.device_id,
+        timestamp: new Date(log.created_at).toLocaleString(),
+        event: log.event,
+        details: log.details,
+        status: log.status
+      }));
+      setDeviceLogs(mappedLogs);
+
+      setLoading(false);
+    })
+    .catch(() => {
+      setError('Failed to fetch data');
+      setLoading(false);
+    });
+  }, []);
+
+  // Edit handler
+  const handleEdit = (device) => {
+    setEditId(device.id);
+    setFormData({
+      imeiNumber: device.imeiNumber,
+      simNumber: device.simNumber,
+      yhonkSerialNumber: device.yhonkSerialNumber,
+      description: device.description
+    });
+    setShowForm(true);
+  };
+
+  // Delete handler
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this device?')) return;
+    try {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      setDevices(prev => prev.filter(d => d.id !== id));
+    } catch {
+      setError('Failed to delete device');
+    }
+  };
+
+  // Add/Edit submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
     const newDevice = {
-      id: Date.now(),
-      ...formData,
+      imei_number: formData.imeiNumber,
+      sim_number: formData.simNumber,
+      serial_number: formData.yhonkSerialNumber,
+      description: formData.description,
       status: 'Active',
-      lastSeen: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      batteryLevel: 100,
-      signalStrength: 'Strong'
+      last_seen: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      battery_level: 100,
+      signal_strength: 'Strong'
     };
-    setDevices(prev => [...prev, newDevice]);
-    setFormData({
-      imeiNumber: '',
-      simNumber: '',
-      yhonkSerialNumber: '',
-      description: ''
-    });
-    setShowForm(false);
+    if (editId) {
+      fetch(`${API_URL}/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDevice)
+      })
+        .then(res => res.json())
+        .then(data => {
+          setDevices(prev => prev.map(d => d.id === editId ? {
+            ...d,
+            ...formData,
+            status: 'Active',
+            lastSeen: newDevice.last_seen,
+            batteryLevel: 100,
+            signalStrength: 'Strong'
+          } : d));
+          setEditId(null);
+          setFormData({
+            imeiNumber: '',
+            simNumber: '',
+            yhonkSerialNumber: '',
+            description: ''
+          });
+          setShowForm(false);
+        })
+        .catch(() => setError('Failed to update device'));
+    } else {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDevice)
+      })
+        .then(res => res.json())
+        .then(data => {
+          setDevices(prev => [
+            ...prev,
+            {
+              id: data.id,
+              ...formData,
+              status: 'Active',
+              lastSeen: newDevice.last_seen,
+              batteryLevel: 100,
+              signalStrength: 'Strong'
+            }
+          ]);
+          setFormData({
+            imeiNumber: '',
+            simNumber: '',
+            yhonkSerialNumber: '',
+            description: ''
+          });
+          setShowForm(false);
+        })
+        .catch(() => setError('Failed to add device'));
+    }
   };
 
-  const filteredDevices = devices.filter(device =>
-    device.imeiNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    device.yhonkSerialNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    device.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDevices = devices.filter(device => {
+    const searchMatch = device.imeiNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      device.yhonkSerialNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      device.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const statusMatch = deviceFilters.status ? device.status === deviceFilters.status : true;
+    const signalMatch = deviceFilters.signalStrength ? device.signalStrength === deviceFilters.signalStrength : true;
+
+    return searchMatch && statusMatch && signalMatch;
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -108,7 +195,30 @@ const DeviceManagement = () => {
     return '#dc2626';
   };
 
-  // for directly opening the form when clicked on the button from quick action
+  const fetchDeviceLogs = () => {
+    const queryParams = new URLSearchParams();
+    if (logFilters.event) queryParams.append('event', logFilters.event);
+    if (logFilters.status) queryParams.append('status', logFilters.status);
+    fetch(`http://localhost:5000/api/device-logs?${queryParams.toString()}`)
+      .then(res => res.json())
+      .then(logsData => {
+        const mappedLogs = logsData.map(log => ({
+          id: log.id,
+          deviceId: log.device_id,
+          timestamp: new Date(log.created_at).toLocaleString(),
+          event: log.event,
+          details: log.details,
+          status: log.status
+        }));
+        setDeviceLogs(mappedLogs);
+      })
+      .catch(() => setError('Failed to fetch device logs'));
+  };
+
+  useEffect(() => {
+    fetchDeviceLogs();
+  }, [logFilters]);
+
   useEffect(() => {
     if (searchParams.get("showForm") === "true") {
       setShowForm(true);
@@ -122,7 +232,7 @@ const DeviceManagement = () => {
           <h2 className='subtitle'>Manage Devices</h2>
           <p className="subtitle">Register and manage Yhonk devices</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+        <button className="btn btn-primary" onClick={() => { setShowForm(true); setEditId(null); }}>
           <Plus size={16} />
           Add Device
         </button>
@@ -140,13 +250,13 @@ const DeviceManagement = () => {
           />
         </div>
         <div className="filter-options">
-          <select className="form-select">
+          <select className="form-select" value={deviceFilters.status} onChange={e => setDeviceFilters(f => ({ ...f, status: e.target.value }))}>
             <option value="">All Status</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
             <option value="Error">Error</option>
           </select>
-          <select className="form-select">
+          <select className="form-select" value={deviceFilters.signalStrength} onChange={e => setDeviceFilters(f => ({ ...f, signalStrength: e.target.value }))}>
             <option value="">All Signal Strength</option>
             <option value="Strong">Strong</option>
             <option value="Medium">Medium</option>
@@ -160,8 +270,8 @@ const DeviceManagement = () => {
         <div className="form-overlay">
           <div className="form-modal">
             <div className="form-header">
-              <h3>Add New Device</h3>
-              <button className="close-btn" onClick={() => setShowForm(false)}>
+              <h3>{editId ? "Edit Device" : "Add New Device"}</h3>
+              <button className="close-btn" onClick={() => { setShowForm(false); setEditId(null); }}>
                 <X size={20} />
               </button>
             </div>
@@ -222,11 +332,11 @@ const DeviceManagement = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowForm(false); setEditId(null); }}>
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Add Device
+                  {editId ? "Update Device" : "Add Device"}
                 </button>
               </div>
             </form>
@@ -236,87 +346,93 @@ const DeviceManagement = () => {
 
       {/* Devices Table */}
       <div className="devices-table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Device</th>
-              <th>IMEI</th>
-              <th>SIM</th>
-              <th>Status</th>
-              <th>Battery</th>
-              <th>Signal</th>
-              <th>Last Seen</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDevices.map(device => (
-              <tr key={device.id}>
-                <td>
-                  <div className="device-info">
-                    <div className="device-serial">
-                      <Smartphone size={16} />
-                      <span>{device.yhonkSerialNumber}</span>
-                    </div>
-                    <div className="device-description">{device.description}</div>
-                  </div>
-                </td>
-                <td>
-                  <div className="imei-number">{device.imeiNumber}</div>
-                </td>
-                <td>
-                  <div className="sim-number">{device.simNumber}</div>
-                </td>
-                <td>
-                  <span className={`badge ${getStatusColor(device.status)}`}>
-                    {device.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="battery-indicator">
-                    <div className="battery-bar">
-                      <div 
-                        className="battery-level" 
-                        style={{ 
-                          width: `${device.batteryLevel}%`,
-                          backgroundColor: getBatteryColor(device.batteryLevel)
-                        }}
-                      ></div>
-                    </div>
-                    <span className="battery-text">{device.batteryLevel}%</span>
-                  </div>
-                </td>
-                <td>
-                  <div className="signal-indicator">
-                    <Signal size={14} />
-                    <span>{device.signalStrength}</span>
-                  </div>
-                </td>
-                <td>
-                  <div className="last-seen">
-                    <div className="timestamp">{device.lastSeen}</div>
-                  </div>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button className="action-btn edit">
-                      <Edit size={14} />
-                    </button>
-                    <button className="action-btn delete">
-                      <Trash2 size={14} />
-                    </button>
-                    <button
-                      className="btn btn-red"
-                      onClick={() => { setSelectedDevice(device); setShowChecklist(true); }}
-                    >
-                      Start Installation Checklist
-                    </button>
-                  </div>
-                </td>
+        {loading ? (
+          <div>Loading devices...</div>
+        ) : error ? (
+          <div style={{ color: 'red' }}>{error}</div>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>IMEI</th>
+                <th>SIM</th>
+                <th>Status</th>
+                <th>Battery</th>
+                <th>Signal</th>
+                <th>Last Seen</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredDevices.map(device => (
+                <tr key={device.id}>
+                  <td>
+                    <div className="device-info">
+                      <div className="device-serial">
+                        <Smartphone size={16} />
+                        <span>{device.yhonkSerialNumber}</span>
+                      </div>
+                      <div className="device-description">{device.description}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="imei-number">{device.imeiNumber}</div>
+                  </td>
+                  <td>
+                    <div className="sim-number">{device.simNumber}</div>
+                  </td>
+                  <td>
+                    <span className={`badge ${getStatusColor(device.status)}`}>
+                      {device.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="battery-indicator">
+                      <div className="battery-bar">
+                        <div 
+                          className="battery-level" 
+                          style={{ 
+                            width: `${device.batteryLevel}%`,
+                            backgroundColor: getBatteryColor(device.batteryLevel)
+                          }}
+                        ></div>
+                      </div>
+                      <span className="battery-text">{device.batteryLevel}%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="signal-indicator">
+                      <Signal size={14} />
+                      <span>{device.signalStrength}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="last-seen">
+                      <div className="timestamp">{device.lastSeen}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="action-btn edit" onClick={() => handleEdit(device)}>
+                        <Edit size={14} />
+                      </button>
+                      <button className="action-btn delete" onClick={() => handleDelete(device.id)}>
+                        <Trash2 size={14} />
+                      </button>
+                      <button
+                        className="btn btn-red"
+                        onClick={() => { setSelectedDevice(device); setShowChecklist(true); }}
+                      >
+                        Start Installation Checklist
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Device Log Table */}
@@ -324,17 +440,22 @@ const DeviceManagement = () => {
         <div className="section-header">
           <h3>Device Logs</h3>
           <div className="log-filters">
-            <select className="form-select">
+            <select className="form-select" value={logFilters.event} onChange={e => setLogFilters(f => ({ ...f, event: e.target.value }))}>
               <option value="">All Events</option>
-              <option value="Location Update">Location Update</option>
-              <option value="Battery Check">Battery Check</option>
-              <option value="Signal Test">Signal Test</option>
+              <option value="Device Online">Device Online</option>
+              <option value="Low Battery">Low Battery</option>
+              <option value="Device Offline">Device Offline</option>
+              <option value="Firmware Update">Firmware Update</option>
+              <option value="GPS Signal Lost">GPS Signal Lost</option>
+              <option value="Tamper Alert">Tamper Alert</option>
+              <option value="GPS Signal Acquired">GPS Signal Acquired</option>
             </select>
-            <select className="form-select">
+            <select className="form-select" value={logFilters.status} onChange={e => setLogFilters(f => ({ ...f, status: e.target.value }))}>
               <option value="">All Status</option>
               <option value="Success">Success</option>
               <option value="Error">Error</option>
               <option value="Warning">Warning</option>
+              <option value="Critical">Critical</option>
             </select>
           </div>
         </div>
@@ -362,7 +483,7 @@ const DeviceManagement = () => {
                   <td>
                     <div className="log-device">
                       <Smartphone size={12} />
-                      <span>YHNK-2024-001</span>
+                      <span>{devices.find(d => d.id === log.deviceId)?.yhonkSerialNumber}</span>
                     </div>
                   </td>
                   <td>
@@ -401,4 +522,4 @@ const DeviceManagement = () => {
   );
 };
 
-export default DeviceManagement; 
+export default DeviceManagement;

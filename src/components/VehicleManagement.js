@@ -4,25 +4,15 @@ import { Car, Plus, Search, Edit, Trash2, X } from 'lucide-react';
 import { differenceInYears } from 'date-fns';
 import './VehicleManagement.css';
 
+const API_URL = 'http://localhost:5000/api/vehicles';
+
 const VehicleManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
-  const [vehicles, setVehicles] = useState([
-    {
-      id: 1,
-      registrationNumber: 'MH12AB1234',
-      registrationDate: '2020-03-15',
-      brand: 'Toyota',
-      model: 'Camry',
-      vehicleType: 'Sedan',
-      ownership: 'Owned',
-      age: 3,
-      hornDecibel: 85,
-      drivenBy: 'John Doe',
-      uses: 'Personal'
-    }
-  ]);
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     registrationNumber: '',
@@ -33,8 +23,12 @@ const VehicleManagement = () => {
     ownership: '',
     hornDecibel: '',
     drivenBy: '',
-    uses: ''
+    uses: '',
+    age: ''
   });
+
+  const [editId, setEditId] = useState(null);
+  const [formMode, setFormMode] = useState('add');
 
   const brands = ['Toyota', 'Honda', 'Maruti Suzuki', 'Hyundai', 'Mahindra', 'Tata', 'Ford', 'BMW', 'Mercedes', 'Audi'];
   const models = {
@@ -66,7 +60,6 @@ const VehicleManagement = () => {
       [name]: value
     }));
 
-    // Auto-calculate age when registration date changes
     if (name === 'registrationDate') {
       const age = calculateAge(value);
       setFormData(prev => ({
@@ -76,39 +69,137 @@ const VehicleManagement = () => {
     }
   };
 
+  useEffect(() => {
+    setLoading(true);
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        const mapped = data.map(vehicle => ({
+          id: vehicle.id,
+          registrationNumber: vehicle.registration_number,
+          registrationDate: vehicle.registration_date,
+          brand: vehicle.brand,
+          model: vehicle.model,
+          vehicleType: vehicle.vehicle_type,
+          ownership: vehicle.ownership,
+          hornDecibel: vehicle.horn_decibel,
+          drivenBy: vehicle.driven_by,
+          uses: vehicle.uses,
+          age: calculateAge(vehicle.registration_date)
+        }));
+        setVehicles(mapped);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('Failed to fetch vehicles');
+        setLoading(false);
+      });
+  }, []);
+
+  // Add/Edit submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newVehicle = {
-      id: Date.now(),
-      ...formData,
-      age: calculateAge(formData.registrationDate)
+    const vehicleData = {
+      registration_number: formData.registrationNumber,
+      registration_date: formData.registrationDate,
+      brand: formData.brand,
+      model: formData.model,
+      vehicle_type: formData.vehicleType,
+      ownership: formData.ownership,
+      horn_decibel: formData.hornDecibel,
+      driven_by: parseInt(formData.drivenBy, 10),
+      uses: formData.uses
     };
-    setVehicles(prev => [...prev, newVehicle]);
+
+    const resetForm = () => {
+      setEditId(null);
+      setFormMode('add');
+      setFormData({
+        registrationNumber: '', registrationDate: '', brand: '', model: '',
+        vehicleType: '', ownership: '', hornDecibel: '', drivenBy: '',
+        uses: '', age: ''
+      });
+      setShowForm(false);
+    };
+
+    if (formMode === 'edit') {
+      fetch(`${API_URL}/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vehicleData)
+      })
+        .then(res => res.json())
+        .then(() => {
+          // Create the updated vehicle object
+          const updatedVehicle = {
+            ...vehicles.find(v => v.id === editId), 
+            ...formData, 
+            age: calculateAge(formData.registrationDate)
+          };
+          // Update the state
+          setVehicles(prev => prev.map(v => v.id === editId ? updatedVehicle : v));
+          resetForm();
+        })
+        .catch(() => setError('Failed to update vehicle'));
+    } else {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vehicleData)
+      })
+        .then(res => res.json())
+        .then(data => {
+          setVehicles(prev => [
+            ...prev,
+            { id: data.id, ...formData, age: calculateAge(formData.registrationDate) }
+          ]);
+          resetForm();
+        })
+        .catch(() => setError('Failed to add vehicle'));
+    }
+  };
+
+  const handleEdit = (vehicle) => {
+    setFormMode('edit');
+    setEditId(vehicle.id);
     setFormData({
-      registrationNumber: '',
-      registrationDate: '',
-      brand: '',
-      model: '',
-      vehicleType: '',
-      ownership: '',
-      hornDecibel: '',
-      drivenBy: '',
-      uses: ''
+      registrationNumber: vehicle.registrationNumber,
+      registrationDate: vehicle.registrationDate,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      vehicleType: vehicle.vehicleType,
+      ownership: vehicle.ownership,
+      hornDecibel: vehicle.hornDecibel,
+      drivenBy: vehicle.drivenBy,
+      uses: vehicle.uses,
+      age: vehicle.age
     });
-    setShowForm(false);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this vehicle?')) return;
+    try {
+      const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error('Failed to delete vehicle');
+      }
+      setVehicles(prev => prev.filter(v => v.id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const filteredVehicles = vehicles.filter(vehicle =>
-    vehicle.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.model.toLowerCase().includes(searchTerm.toLowerCase())
+    vehicle.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // for directly opening the form when clicked on the button from quick action
   useEffect(() => {
-      if (searchParams.get("showForm") === "true") {
-        setShowForm(true);
-      }
+    if (searchParams.get("showForm") === "true") {
+      setShowForm(true);
+    }
   }, [searchParams]);
 
   return (
@@ -118,7 +209,7 @@ const VehicleManagement = () => {
           <h2 className="subtitle">Manage Vehicles</h2>
           <p className="subtitle">Register and manage vehicle information</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+        <button className="btn btn-primary" onClick={() => { setFormMode('add'); setEditId(null); setShowForm(true); }}>
           <Plus size={16} />
           Add Vehicle
         </button>
@@ -156,8 +247,8 @@ const VehicleManagement = () => {
         <div className="form-overlay">
           <div className="form-modal">
             <div className="form-header">
-              <h3>Add New Vehicle</h3>
-              <button className="close-btn" onClick={() => setShowForm(false)}>
+              <h3>{formMode === 'edit' ? "Edit Vehicle" : "Add New Vehicle"}</h3>
+              <button className="close-btn" onClick={() => { setShowForm(false); setEditId(null); setFormMode('add'); }}>
                 <X size={20} />
               </button>
             </div>
@@ -306,13 +397,12 @@ const VehicleManagement = () => {
                   </select>
                 </div>
               </div>
-
               <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowForm(false); setEditId(null); setFormMode('add'); }}>
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Add Vehicle
+                  {formMode === 'edit' ? "Update Vehicle" : "Add Vehicle"}
                 </button>
               </div>
             </form>
@@ -322,53 +412,59 @@ const VehicleManagement = () => {
 
       {/* Vehicles Table */}
       <div className="vehicles-table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Registration</th>
-              <th>Brand</th>
-              <th>Model</th>
-              <th>Type</th>
-              <th>Age</th>
-              <th>Driver</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredVehicles.map(vehicle => (
-              <tr key={vehicle.id}>
-                <td>
-                  <div className="vehicle-registration">
-                    <Car size={16} />
-                    <span>{vehicle.registrationNumber}</span>
-                  </div>
-                </td>
-                <td>{vehicle.brand}</td>
-                <td>{vehicle.model}</td>
-                <td>{vehicle.vehicleType}</td>
-                <td>{vehicle.age} years</td>
-                <td>{vehicle.drivenBy}</td>
-                <td>
-                  <span className="badge badge-success">Active</span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button className="action-btn edit">
-                      <Edit size={14} />
-                    </button>
-                    <button className="action-btn delete">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
+        {loading ? (
+          <div>Loading vehicles...</div>
+        ) : error ? (
+          <div style={{ color: 'red' }}>{error}</div>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Registration</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Type</th>
+                <th>Age</th>
+                <th>Driver</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredVehicles.map(vehicle => (
+                <tr key={vehicle.id}>
+                  <td>
+                    <div className="vehicle-registration">
+                      <Car size={16} />
+                      <span>{vehicle.registrationNumber}</span>
+                    </div>
+                  </td>
+                  <td>{vehicle.brand}</td>
+                  <td>{vehicle.model}</td>
+                  <td>{vehicle.vehicleType}</td>
+                  <td>{vehicle.age} years</td>
+                  <td>{vehicle.drivenBy}</td>
+                  <td>
+                    <span className="badge badge-success">Active</span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="action-btn edit" onClick={() => handleEdit(vehicle)}>
+                        <Edit size={14} />
+                      </button>
+                      <button className="action-btn delete" onClick={() => handleDelete(vehicle.id)}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 };
 
-export default VehicleManagement; 
+export default VehicleManagement;
