@@ -10,6 +10,8 @@ const DriverManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
+  const [filterGender, setFilterGender] = useState('');
+  const [filterLicenseType, setFilterLicenseType] = useState('');
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -267,11 +269,17 @@ const DriverManagement = () => {
     }
   };
 
-  const filteredDrivers = drivers.filter(driver =>
-    (driver.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (driver.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (driver.licenseNumber || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDrivers = drivers.filter(driver => {
+    const fullName = `${driver.firstName || ''} ${driver.lastName || ''}`.toLowerCase();
+    const searchMatch =
+      fullName.includes(searchTerm.toLowerCase()) ||
+      (driver.licenseNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+    const genderMatch = filterGender ? driver.gender === filterGender : true;
+    const licenseTypeMatch = filterLicenseType ? driver.licenseType === filterLicenseType : true;
+
+    return searchMatch && genderMatch && licenseTypeMatch;
+  });
 
   // for directly opening the form when clicked on the button from quick action
   useEffect(() => {
@@ -305,13 +313,21 @@ const DriverManagement = () => {
           />
         </div>
         <div className="filter-options">
-          <select className="form-select">
+          <select
+            className="form-select"
+            value={filterGender}
+            onChange={(e) => setFilterGender(e.target.value)}
+          >
             <option value="">All Genders</option>
             {genders.map(gender => (
               <option key={gender} value={gender}>{gender}</option>
             ))}
           </select>
-          <select className="form-select">
+          <select
+            className="form-select"
+            value={filterLicenseType}
+            onChange={(e) => setFilterLicenseType(e.target.value)}
+          >
             <option value="">All License Types</option>
             {licenseTypes.map(type => (
               <option key={type} value={type}>{type}</option>

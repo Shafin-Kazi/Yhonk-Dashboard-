@@ -10,6 +10,8 @@ const VehicleManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
+  const [filterBrand, setFilterBrand] = useState('');
+  const [filterType, setFilterType] = useState('');
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -190,11 +192,17 @@ const VehicleManagement = () => {
     }
   };
 
-  const filteredVehicles = vehicles.filter(vehicle =>
-    vehicle.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVehicles = vehicles.filter(vehicle => {
+    const searchMatch =
+      vehicle.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const brandMatch = filterBrand ? vehicle.brand === filterBrand : true;
+    const typeMatch = filterType ? vehicle.vehicleType === filterType : true;
+
+    return searchMatch && brandMatch && typeMatch;
+  });
 
   useEffect(() => {
     if (searchParams.get("showForm") === "true") {
@@ -227,13 +235,21 @@ const VehicleManagement = () => {
           />
         </div>
         <div className="filter-options">
-          <select className="form-select">
+          <select
+            className="form-select"
+            value={filterBrand}
+            onChange={(e) => setFilterBrand(e.target.value)}
+          >
             <option value="">All Brands</option>
             {brands.map(brand => (
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
-          <select className="form-select">
+          <select
+            className="form-select"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+          >
             <option value="">All Types</option>
             {vehicleTypes.map(type => (
               <option key={type} value={type}>{type}</option>
