@@ -8,7 +8,6 @@ const API_URL = 'http://localhost:5000/api/horn-summary-reports';
 export default function HornSummaryReport() {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState("");
-  const [selectedDriver, setSelectedDriver] = useState("");
   const [imei, setImei] = useState("");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showDownload, setShowDownload] = useState(false);
@@ -19,14 +18,12 @@ export default function HornSummaryReport() {
   const [error, setError] = useState(null);
   const [groups, setGroups] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [drivers, setDrivers] = useState([]);
 
   const fetchData = () => {
     setLoading(true);
     const queryParams = new URLSearchParams();
     if (selectedGroup) queryParams.append('group', selectedGroup);
     if (selectedVehicle) queryParams.append('vehicle', selectedVehicle);
-    if (selectedDriver) queryParams.append('driver', selectedDriver);
     if (imei) queryParams.append('imei', imei);
     if (dateRange.from) queryParams.append('from', dateRange.from);
     if (dateRange.to) queryParams.append('to', dateRange.to);
@@ -63,16 +60,6 @@ export default function HornSummaryReport() {
     }
   }, [selectedGroup]);
 
-  useEffect(() => {
-    if (selectedVehicle) {
-      fetch(`http://localhost:5000/api/horn-summary-chart/drivers?vehicle=${selectedVehicle}`)
-        .then(res => res.json())
-        .then(data => setDrivers(data))
-        .catch(() => setError('Failed to fetch drivers'));
-    } else {
-      setDrivers([]);
-    }
-  }, [selectedVehicle]);
 
   useEffect(() => {
     fetchData();
@@ -81,7 +68,6 @@ export default function HornSummaryReport() {
   const handleReset = () => {
     setSelectedGroup("");
     setSelectedVehicle("");
-    setSelectedDriver("");
     setImei("");
     setDateRange({ from: "", to: "" });
   };
@@ -92,23 +78,16 @@ export default function HornSummaryReport() {
       <div className="report-search-panel">
         <div>
           <label>Select Group</label>
-          <select value={selectedGroup} onChange={e => { setSelectedGroup(e.target.value); setSelectedVehicle(""); setSelectedDriver(""); }}>
+          <select value={selectedGroup} onChange={e => { setSelectedGroup(e.target.value); setSelectedVehicle(""); }}>
             <option value="">All</option>
             {groups.map(g => <option key={g}>{g}</option>)}
           </select>
         </div>
         <div>
           <label>Select Vehicle</label>
-          <select value={selectedVehicle} onChange={e => { setSelectedVehicle(e.target.value); setSelectedDriver(""); }} disabled={!selectedGroup}>
+          <select value={selectedVehicle} onChange={e => { setSelectedVehicle(e.target.value); }} disabled={!selectedGroup}>
             <option value="">All</option>
             {vehicles.map(v => <option key={v}>{v}</option>)}
-          </select>
-        </div>
-        <div>
-          <label>Select Driver Serial Number</label>
-          <select value={selectedDriver} onChange={e => setSelectedDriver(e.target.value)} disabled={!selectedVehicle}>
-            <option value="">All</option>
-            {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         </div>
         <div>

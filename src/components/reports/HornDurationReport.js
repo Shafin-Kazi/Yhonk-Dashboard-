@@ -11,7 +11,6 @@ const durations = ["0–10s", "11–30s", "30+s"];
 export default function HornDurationReport() {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState("");
-  const [selectedDriver, setSelectedDriver] = useState("");
   const [selectedHornType, setSelectedHornType] = useState("");
   const [selectedDuration, setSelectedDuration] = useState("");
   const [imei, setImei] = useState("");
@@ -22,7 +21,6 @@ export default function HornDurationReport() {
   const [error, setError] = useState(null);
   const [groups, setGroups] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [drivers, setDrivers] = useState([]);
 
   // Paging/sorting state (mocked)
   const [page, setPage] = useState(1);
@@ -37,7 +35,6 @@ export default function HornDurationReport() {
     const queryParams = new URLSearchParams();
     if (selectedGroup) queryParams.append('group', selectedGroup);
     if (selectedVehicle) queryParams.append('vehicle', selectedVehicle);
-    if (selectedDriver) queryParams.append('driver', selectedDriver);
     if (selectedHornType) queryParams.append('hornType', selectedHornType);
     if (selectedDuration) queryParams.append('duration', selectedDuration);
     if (imei) queryParams.append('imei', imei);
@@ -76,16 +73,6 @@ export default function HornDurationReport() {
     }
   }, [selectedGroup]);
 
-  useEffect(() => {
-    if (selectedVehicle) {
-      fetch(`http://localhost:5000/api/horn-summary-chart/drivers?vehicle=${selectedVehicle}`)
-        .then(res => res.json())
-        .then(data => setDrivers(data))
-        .catch(() => setError('Failed to fetch drivers'));
-    } else {
-      setDrivers([]);
-    }
-  }, [selectedVehicle]);
 
   useEffect(() => {
     fetchData();
@@ -97,23 +84,16 @@ export default function HornDurationReport() {
       <div className="report-search-panel">
         <div>
           <label>Select Group</label>
-          <select value={selectedGroup} onChange={e => { setSelectedGroup(e.target.value); setSelectedVehicle(""); setSelectedDriver(""); }}>
+          <select value={selectedGroup} onChange={e => { setSelectedGroup(e.target.value); setSelectedVehicle(""); }}>
             <option value="">All</option>
             {groups.map(g => <option key={g}>{g}</option>)}
           </select>
         </div>
         <div>
           <label>Select Vehicle</label>
-          <select value={selectedVehicle} onChange={e => { setSelectedVehicle(e.target.value); setSelectedDriver(""); }} disabled={!selectedGroup}>
+          <select value={selectedVehicle} onChange={e => { setSelectedVehicle(e.target.value); }} disabled={!selectedGroup}>
             <option value="">All</option>
             {vehicles.map(v => <option key={v}>{v}</option>)}
-          </select>
-        </div>
-        <div>
-          <label>Select Driver Serial Number</label>
-          <select value={selectedDriver} onChange={e => setSelectedDriver(e.target.value)} disabled={!selectedVehicle}>
-            <option value="">All</option>
-            {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         </div>
         <div>
