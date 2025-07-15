@@ -199,18 +199,6 @@ const DriverDashboard = () => {
             </div>
           </div>
         </div>
-        <div className="stat-card orange">
-          <div className="stat-icon">
-            <CreditCard size={24} />
-          </div>
-          <div className="stat-content">
-            <h3>Earnings</h3>
-            <div className="stat-value">₹45K</div>
-            <div className="stat-change">
-              <span>This month</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Tab Navigation */}
