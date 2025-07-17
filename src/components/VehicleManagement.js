@@ -32,21 +32,69 @@ const VehicleManagement = () => {
   const [editId, setEditId] = useState(null);
   const [formMode, setFormMode] = useState('add');
 
-  const brands = ['Toyota', 'Honda', 'Maruti Suzuki', 'Hyundai', 'Mahindra', 'Tata', 'Ford', 'BMW', 'Mercedes', 'Audi'];
-  const models = {
-    'Toyota': ['Camry', 'Corolla', 'Innova', 'Fortuner'],
-    'Honda': ['City', 'Civic', 'CR-V', 'Amaze'],
-    'Maruti Suzuki': ['Swift', 'Dzire', 'Ertiga', 'Brezza'],
-    'Hyundai': ['i20', 'Verna', 'Creta', 'Venue'],
-    'Mahindra': ['XUV500', 'Scorpio', 'Thar', 'Bolero'],
-    'Tata': ['Nexon', 'Harrier', 'Safari', 'Punch'],
-    'Ford': ['EcoSport', 'Endeavour', 'Figo', 'Aspire'],
-    'BMW': ['3 Series', '5 Series', 'X1', 'X3'],
-    'Mercedes': ['A-Class', 'C-Class', 'E-Class', 'GLA'],
-    'Audi': ['A3', 'A4', 'Q3', 'Q5']
+  const brands = ['Toyota', 'Honda', 'Maruti Suzuki', 'Hyundai', 'Mahindra', 'Tata', 'Ford', 'BMW', 'Mercedes', 'Audi', 'TVS', 'Force Motors', 'Ashok Leyland', 'Volvo', 'Bharat Benz'];
+  const brandVehicleTypeMap = {
+    'MCWG (Motor Cycle with Gear)': {
+      'Honda': ['CB Shine', 'SP 125', 'Unicorn', 'Hornet', 'Hness CB350', 'Other'],
+      'BMW': ['G310R', 'G310GS', 'Other'],
+      'Mahindra': ['Mojo', 'Other']
+    },
+    'MCWOG (Motor Cycle without Gear)': {
+      'Honda': ['Activa (All Series)', 'Dio', 'Other'],
+      'Mahindra': ['Gusto', 'Electric Scooters', 'Other'],
+      'TVS': ['Jupiter', 'iQube', 'Other']
+    },
+    'LMV (Light Motor Vehicle)': {
+      'Toyota': ['Camry', 'Corolla', 'Glanza', 'Other'],
+      'Honda': ['City', 'Amaze', 'Elevate', 'Other'],
+      'Maruti Suzuki': ['Swift', 'Baleno', 'Dzire', 'Celerio', 'Other'],
+      'Hyundai': ['i20', 'Verna', 'Venue', 'Other'],
+      'Mahindra': ['Thar', 'XUV300', 'Other'],
+      'Tata': ['Punch', 'Altroz', 'Tiago', 'Other'],
+      'Ford': ['Figo', 'Aspire', 'Other'],
+      'BMW': ['3 Series', '5 Series', 'X1', 'Other'],
+      'Mercedes': ['C-Class', 'A-Class', 'Other'],
+      'Audi': ['A4', 'A3', 'Other'],
+      'Volvo': ['XC40', 'XC60', 'XC90', 'S60', 'S90', 'C40 Recharge', 'Other']
+    },
+    'LMV-NT (Light Motor Vehicle – Non-Transport)': {
+      'Toyota': ['Camry', 'Corolla', 'Innova Crysta', 'Fortuner', 'Other'],
+      'Honda': ['City', 'Civic', 'CR-V', 'Other'],
+      'Maruti Suzuki': ['Swift', 'Brezza', 'Ertiga', 'Baleno', 'Other'],
+      'Hyundai': ['Creta', 'Venue', 'Verna', 'Other'],
+      'Mahindra': ['Scorpio', 'XUV500', 'Bolero', 'Other'],
+      'Tata': ['Nexon', 'Harrier', 'Safari', 'Other'],
+      'Ford': ['EcoSport', 'Endeavour', 'Other'],
+      'BMW': ['X1', 'iX', '3 Series', 'Other'],
+      'Mercedes': ['C-Class', 'E-Class', 'GLC', 'Other'],
+      'Audi': ['A4', 'Q3', 'Q5', 'Other'],
+      'Volvo': ['XC40', 'XC60', 'XC90', 'S60', 'S90', 'C40 Recharge', 'Other']
+    },
+    'LMV-TR (Light Motor Vehicle – Transport)': {
+      'Toyota': ['Innova Touring', 'Urban Cruiser Hyryder Taxi', 'Other'],
+      'Honda': ['Amaze Tour', 'Other'],
+      'Maruti Suzuki': ['Eeco Cargo', 'Tour H1', 'Tour M', 'Other'],
+      'Hyundai': ['Aura CNG Taxi Variants', 'Other'],
+      'Mahindra': ['Bolero Maxx', 'Jeeto', 'Supro', 'Other'],
+      'Tata': ['Ace', 'Magic', 'Intra', 'Other']
+    },
+    'TRANS (Transport Vehicle)': {
+      'Toyota': ['Hilux (Commercial + Lifestyle)', 'Other'],
+      'Mahindra': ['Bolero Pik-Up', 'Furio Truck', 'Jeeto Plus', 'Other'],
+      'Tata': ['Tata Yodha Pickup', 'Tata LPT 407', 'Tata 1512 Truck', 'Other'],
+      'Force Motors': ['Traveller Minibus', 'Other']
+    },
+    'HMV (Heavy Motor Vehicle)': {
+      'Tata': ['Tata Prima', 'Tata Signa (Trucks and Trailers)', 'Other'],
+      'Mahindra': ['Blazo X Trucks', 'Furio Trucks', 'Other'],
+      'Mercedes': ['Mercedes-Benz Actros', 'Other'],
+      'Ashok Leyland': ['Dost','2518', 'Other'],
+      'Volvo': ['Buses (All Series)','HCVs (Heavy Commercial Vehicals - All Series)', 'Other'],
+      'Bharat Benz': ['Buses (All Series)','HCVs (Heavy Commercial Vehicals - All Series)', 'Other'],
+    }
   };
 
-  const vehicleTypes = ['Sedan', 'SUV', 'Hatchback', 'MUV', 'Truck', 'Bus', 'Motorcycle'];
+  const vehicleTypes = ['MCWG (Motor Cycle with Gear)', 'MCWOG (Motor Cycle without Gear)', 'LMV (Light Motor Vehicle)', 'LMV-NT (Light Motor Vehicle – Non-Transport)', 'LMV-TR (Light Motor Vehicle – Transport)', 'TRANS (Transport Vehicle)', 'HMV (Heavy Motor Vehicle)'];
   const ownershipTypes = ['Owned', 'Leased', 'Rented', 'Company'];
   const useTypes = ['Personal', 'Commercial', 'Transport', 'Delivery', 'Rental'];
 
@@ -70,6 +118,21 @@ const VehicleManagement = () => {
       }));
     }
   };
+
+  //model filter according to the vehical brand and type
+  const getFilteredModels = () => {
+    if (!formData.brand || !formData.vehicleType) return [];
+
+    const vehicleTypeData = brandVehicleTypeMap[formData.vehicleType];
+    if (!vehicleTypeData) return [];
+
+    const brandModels = vehicleTypeData[formData.brand];
+    if (!brandModels) return [];
+
+    return brandModels;
+  };
+
+
 
   useEffect(() => {
     setLoading(true);
@@ -312,16 +375,16 @@ const VehicleManagement = () => {
 
                 <div className="form-group">
                   <label className="form-label">Model Name *</label>
+                  {/* changed a bit select function to get the filter according to the vehicle brand and types */}
                   <select
                     name="model"
-                    className="form-select"
                     value={formData.model}
+                    className="form-select"
                     onChange={handleInputChange}
                     required
-                    disabled={!formData.brand}
                   >
                     <option value="">Select Model</option>
-                    {formData.brand && models[formData.brand]?.map(model => (
+                    {getFilteredModels().map(model => (
                       <option key={model} value={model}>{model}</option>
                     ))}
                   </select>

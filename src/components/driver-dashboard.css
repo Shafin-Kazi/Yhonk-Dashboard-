@@ -26,6 +26,14 @@
   gap: 1rem;
 }
 
+.driver-info > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 .driver-avatar {
   width: 64px;
   height: 64px;
