@@ -21,7 +21,17 @@ const DriverDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
 
-  const [driverProfile, setDriverProfile] = useState({
+  //CAUTION: This uses local storage. Here use any backend data base to store the info (This is done for just trial purpose)
+  const handleSave = () => {
+    setIsEditing(false);
+    // Here you would typically save to backend database (FOR TRIAL PURPOSE IT USES LOCAL STORAGE WHICH IS NOT SAFE)
+    localStorage.setItem("driverProfile", JSON.stringify(driverProfile));
+    console.log("Saving profile:", driverProfile);
+  };
+
+  const [driverProfile, setDriverProfile] = useState(() => {
+  const savedProfile = localStorage.getItem("driverProfile");
+  return savedProfile ? JSON.parse(savedProfile) : {
     firstName: "Rajesh",
     lastName: "Kumar",
     dateOfBirth: "1985-06-15",
@@ -49,7 +59,8 @@ const DriverDashboard = () => {
     state: "Maharashtra",
     city: "Mumbai",
     pincode: "400001",
-  });
+  };
+});
 
   const handleInputChange = (field, value) => {
     setDriverProfile((prev) => ({
@@ -58,23 +69,31 @@ const DriverDashboard = () => {
     }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would typically save to backend
-    console.log("Saving profile:", driverProfile);
-  };
-
   const handleCancel = () => {
     setIsEditing(false);
     // Reset to original values if needed
   };
+
+  //ocupation array
+  const occupation = [
+    "State Transport Driver - Public Buses/Vehicles",
+    "Police Department Driver - Police Vans/Jeeps",
+    "Health Department Driver - Ambulances",
+    "Government Offices Driver - Offical Cars",
+    "Postal Department Driver - Mail Vans",
+    "Private Department Driver - Private Vehicles",
+    "Delivery Driver - Goods and Parcels Delivery",
+    "Professional Drivers - Commercial Buses, Trucks",
+    "Ride Share Drivers - Working for Ola, Uber, etc."
+  ];
 
   const renderField = (
     label,
     field,
     type = "text",
     required = false,
-    options
+    options,
+    occupation
   ) => {
     const value = driverProfile[field];
 
@@ -127,8 +146,7 @@ const DriverDashboard = () => {
                 {driverProfile.firstName} {driverProfile.lastName}
               </h2>
               <p>
-                Professional Driver • {driverProfile.driverExperience} years
-                experience
+                {driverProfile.occupation} • {driverProfile.driverExperience} years experience
               </p>
               <div className="driver-rating">
                 <Star size={16} fill="currentColor" />
@@ -195,7 +213,9 @@ const DriverDashboard = () => {
             <h3>Experience</h3>
             <div className="stat-value">{driverProfile.driverExperience}y</div>
             <div className="stat-change">
-              <span>Professional</span>
+              <p>
+                {driverProfile.occupation}
+              </p>
             </div>
           </div>
         </div>
@@ -270,7 +290,7 @@ const DriverDashboard = () => {
                 "Female",
                 "Other",
               ])}
-              {renderField("Occupation", "occupation", "text", true)}
+              {renderField("Occupation", "occupation", "text", true, occupation)}
               {renderField(
                 "Driver Experience (Years)",
                 "driverExperience",
@@ -305,10 +325,13 @@ const DriverDashboard = () => {
                 true
               )}
               {renderField("License Type", "licenseType", "text", true, [
-                "Commercial",
-                "Private",
-                "Heavy Vehicle",
-                "Light Motor Vehicle",
+                "MCWOG (Motorcycle Without Gear)",
+                "MCWG (Motorcycle With Gear)",
+                "LMV (Light Motor Vehicle)",
+                "LMV-NT (Light Motor Vehicle – Non-Transport)",
+                "LMV-TR (Light Motor Vehicle – Transport)",
+                "TRANS (Transport Vehicle License)",
+                "HMV (Heavy Motor Vehicle)",
               ])}
               {renderField(
                 "Date of License Issue",

@@ -71,11 +71,15 @@ const DriverManagement = () => {
   ];
   const genders = ["Male", "Female", "Other"];
   const occupations = [
-    "Professional Driver",
-    "Private Driver",
-    "Commercial Driver",
-    "Transport Driver",
-    "Delivery Driver",
+    "State Transport Driver - Public Buses/Vehicles",
+    "Police Department Driver - Police Vans/Jeeps",
+    "Health Department Driver - Ambulances",
+    "Government Offices Driver - Offical Cars",
+    "Postal Department Driver - Mail Vans",
+    "Private Department Driver - Private Vehicles",
+    "Delivery Driver - Goods and Parcels Delivery",
+    "Professional Drivers - Commercial Buses, Trucks",
+    "Ride Share Drivers - Working for Ola, Uber, etc."
   ];
   const hearingIntelligence = ["Excellent", "Good", "Fair", "Poor"];
   const educationLevels = [
@@ -96,11 +100,13 @@ const DriverManagement = () => {
   const disabilities = ["None", "Visual", "Hearing", "Mobility", "Other"];
   const maritalStatuses = ["Single", "Married", "Divorced", "Widowed"];
   const licenseTypes = [
-    "Learner's License",
-    "Light Motor Vehicle",
-    "Heavy Vehicle",
-    "Commercial Vehicle",
-    "Motorcycle",
+    "MCWOG (Motorcycle Without Gear)",
+    "MCWG (Motorcycle With Gear)",
+    "LMV (Light Motor Vehicle)",
+    "LMV-NT (Light Motor Vehicle – Non-Transport)",
+    "LMV-TR (Light Motor Vehicle – Transport)",
+    "TRANS (Transport Vehicle License)",
+    "HMV (Heavy Motor Vehicle)",
   ];
   const countries = ["India", "USA", "UK", "Canada", "Australia"];
   const states = [
