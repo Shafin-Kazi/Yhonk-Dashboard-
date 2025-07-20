@@ -26,6 +26,7 @@ const DriverManagement = () => {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [customLanguage, setCustomLanguage] = useState("");
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -37,6 +38,8 @@ const DriverManagement = () => {
     experience: "",
     gender: "",
     occupation: "",
+    subOccupation: "",
+    customSubOccupation: "",
     driverRating: "",
     rightEarAudiogram: "",
     leftEarAudiogram: "",
@@ -45,6 +48,7 @@ const DriverManagement = () => {
     education: "",
     income: "",
     disability: "",
+    customDisability: "",
     maritalStatus: "",
     aadharNumber: "",
     licenseNumber: "",
@@ -68,19 +72,25 @@ const DriverManagement = () => {
     "Telugu",
     "Kannada",
     "Malayalam",
+    "Other",
   ];
   const genders = ["Male", "Female", "Other"];
-  const occupations = [
-    "State Transport Driver - Public Buses/Vehicles",
-    "Police Department Driver - Police Vans/Jeeps",
-    "Health Department Driver - Ambulances",
-    "Government Offices Driver - Offical Cars",
-    "Postal Department Driver - Mail Vans",
-    "Private Department Driver - Private Vehicles",
-    "Delivery Driver - Goods and Parcels Delivery",
-    "Professional Drivers - Commercial Buses, Trucks",
-    "Ride Share Drivers - Working for Ola, Uber, etc."
-  ];
+
+  const occupationMap = {
+    "State Transport Driver": ["Public Buses", "Government Vehicles", "Other"],
+    "Police Department Driver": ["Police Cars", "Police Vans", "Police Jeeps", "Police Trucks", "Other"],
+    "Traffic Police Department Driver": ["Traffic Police Cars", "Traffic Police Vans", "Traffic Police Jeeps", "Traffic Police Trucks", "Other"],
+    "Health Department Driver": ["Ambulances", "Government Health Vans", "Other"],
+    "Government Offices Driver": ["Official Cars", "Other"],
+    "Postal Department Driver": ["Mail Vans", "Delivery Post Vehicles", "Other"],
+    "Private Department Driver": ["Personal Cars", "Corporate Cars", "Other"],
+    "Delivery Driver": ["Goods Delivery", "Parcel Services", "Delivery Trucks", "Other"],
+    "Professional Drivers": ["Commercial Buses", "Trucks", "Other"],
+    "Ride Share Drivers": ["Ola", "Uber", "Rapido", "Other"],
+  };
+
+  const occupations = Object.keys(occupationMap);
+
   const hearingIntelligence = ["Excellent", "Good", "Fair", "Poor"];
   const educationLevels = [
     "Primary",
@@ -213,11 +223,18 @@ const DriverManagement = () => {
       name: `${formData.firstName} ${formData.lastName}`,
       date_of_birth: formData.dateOfBirth,
       email: formData.email,
-      preferred_language: formData.preferredLanguage,
+      preferred_language:
+      formData.preferredLanguage === "Other"
+        ? customLanguage
+        : formData.preferredLanguage,  // Use backend here to save new custom language if needed
       phone: formData.phoneNumber,
       experience: formData.experience,
       gender: formData.gender,
       occupation: formData.occupation,
+      sub_occupation:
+      formData.subOccupation === "Other"
+        ? formData.customSubOccupation
+        : formData.subOccupation,
       driver_rating: formData.driverRating,
       right_ear_audiogram: formData.rightEarAudiogram,
       left_ear_audiogram: formData.leftEarAudiogram,
@@ -225,7 +242,10 @@ const DriverManagement = () => {
       personal_hearing_intelligence: formData.personalHearingIntelligence,
       education: formData.education,
       income: formData.income,
-      disability: formData.disability,
+      disability:
+      formData.disability === "Other"
+        ? formData.customDisability
+        : formData.disability,  // Use backend here to store new disability type if needed
       marital_status: formData.maritalStatus,
       aadhar_number: formData.aadharNumber,
       license_number: formData.licenseNumber,
@@ -503,6 +523,19 @@ const DriverManagement = () => {
                         </option>
                       ))}
                     </select>
+                    {formData.preferredLanguage === "Other" && (
+                      <div className="form-group">
+                        <label className="form-label">Enter Language *</label>
+                        <input
+                          type="text"
+                          name="customLanguage"
+                          className="form-input"
+                          value={customLanguage}
+                          onChange={(e) => setCustomLanguage(e.target.value)}
+                          required
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="form-group">
                     <label className="form-label">Phone Number *</label>
@@ -581,6 +614,41 @@ const DriverManagement = () => {
                         </option>
                       ))}
                     </select>
+                    {/* Sub-Occupation Dropdown */}
+                    {formData.occupation && occupationMap[formData.occupation] && (
+                      <div className="form-group">
+                        <label className="form-label">Sub-Occupation *</label>
+                        <select
+                          name="subOccupation"
+                          className="form-select"
+                          value={formData.subOccupation}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="">Select Sub-Occupation</option>
+                          {occupationMap[formData.occupation].map((sub) => (
+                            <option key={sub} value={sub}>
+                              {sub}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Show textbox if "Other" is selected */}
+                    {formData.subOccupation === "Other" && (
+                      <div className="form-group">
+                        <label className="form-label">Specify Sub-Occupation *</label>
+                        <input
+                          type="text"
+                          name="customSubOccupation"
+                          className="form-input"
+                          value={formData.customSubOccupation}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -624,6 +692,19 @@ const DriverManagement = () => {
                         </option>
                       ))}
                     </select>
+                    {formData.disability === "Other" && (
+                      <div className="form-group">
+                        <label className="form-label">Specify Disability *</label>
+                        <input
+                          type="text"
+                          name="customDisability"
+                          className="form-input"
+                          value={formData.customDisability}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
