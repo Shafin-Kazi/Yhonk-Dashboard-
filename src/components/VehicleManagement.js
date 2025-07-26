@@ -18,6 +18,8 @@ const VehicleManagement = () => {
   //new use state for custom brand and model selection
   const [customBrand, setCustomBrand] = useState('');
   const [customModel, setCustomModel] = useState('');  
+  // //wheeler Type
+  // const [filterWheelerType, setFilterWheelerType] = useState('');
 
   const [formData, setFormData] = useState({
     registrationNumber: '',
@@ -29,11 +31,14 @@ const VehicleManagement = () => {
     hornDecibel: '',
     drivenBy: '',
     uses: '',
-    age: ''
+    age: '',
+    wheelerType: ''
   });
 
   const [editId, setEditId] = useState(null);
   const [formMode, setFormMode] = useState('add');
+
+  const types = ['2 Wheeler', '3 Wheeler', '4 Wheeler', '4+ Wheeler'];  //wheeler types
 
   const brands = ['Toyota', 'Honda', 'Maruti Suzuki', 'Hyundai', 'Mahindra', 'Tata', 'Ford', 'BMW', 'Mercedes', 'Audi', 'TVS', 'Force Motors', 'Ashok Leyland', 'Volvo', 'Bharat Benz'];
   const [allBrands, setAllBrands] = useState([...brands]);
@@ -136,6 +141,30 @@ const VehicleManagement = () => {
     return brandModels;
   };
 
+//   // Utility function (OPTIONAL: for filtering based on the vehicle type to select wheeler type)
+// const getWheelerTypeFromVehicleType = (vehicleType) => {
+//   if (['MCWG (Motor Cycle with Gear)', 'MCWOG (Motor Cycle without Gear)'].includes(vehicleType)) return '2 Wheeler';
+//   if (['LMV (Light Motor Vehicle)', 'LMV-NT (Light Motor Vehicle – Non-Transport)', 'LMV-TR (Light Motor Vehicle – Transport)'].includes(vehicleType)) return '4 Wheeler';
+//   if (['TRANS (Transport Vehicle)', 'HMV (Heavy Motor Vehicle)'].includes(vehicleType)) return '4+ Wheeler';
+//   return '';
+// };
+
+// // Filtering logic
+// const filteredVehicles = vehicles.filter(vehicle => {
+//   const searchMatch =
+//     vehicle.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//     vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//     vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase());
+
+//   const brandMatch = filterBrand ? vehicle.brand === filterBrand : true;
+//   const typeMatch = filterType ? vehicle.vehicleType === filterType : true;
+//   const wheelerMatch = filterWheelerType
+//     ? getWheelerTypeFromVehicleType(vehicle.vehicleType) === filterWheelerType
+//     : true;
+
+//   return searchMatch && brandMatch && typeMatch && wheelerMatch;
+// });
+
 
 
   useEffect(() => {
@@ -202,6 +231,7 @@ const VehicleManagement = () => {
       registration_date: formData.registrationDate,
       brand: finalBrand,
       model: finalModel,
+      wheeler_type: formData.wheelerType,  //optional if needed
       vehicle_type: formData.vehicleType,
       ownership: formData.ownership,
       horn_decibel: formData.hornDecibel,
@@ -215,7 +245,7 @@ const VehicleManagement = () => {
       setFormData({
         registrationNumber: '', registrationDate: '', brand: '', model: '',
         vehicleType: '', ownership: '', hornDecibel: '', drivenBy: '',
-        uses: '', age: ''
+        uses: '', age: '', wheelerType: ''
       });
       setShowForm(false);
     };
@@ -423,7 +453,41 @@ const VehicleManagement = () => {
                   )}
                 </div>
 
-                  {/* Similarly for the model */}
+                {/* Select Vehicle Wheeler Type  */}
+                <div className="form-group">
+                  <label className="form-label">Wheeler Type *</label>
+                  <select
+                    name="wheelerType"
+                    className="form-select"
+                    value={formData.wheelerType || ''}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Select Wheeler</option>
+                    {types.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                  {/* Select Vehicle Type */}
+                <div className="form-group">
+                  <label className="form-label">Vehicle Type *</label>
+                  <select
+                    name="vehicleType"
+                    className="form-select"
+                    value={formData.vehicleType}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Select Type</option>
+                    {vehicleTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                  {/* Select Model Type*/}
                 <div className="form-group">
                   <label className="form-label">Model Name *</label>
                   <select
@@ -437,7 +501,10 @@ const VehicleManagement = () => {
                     required
                   >
                     <option value="">Select Model</option>
-                    {[...getFilteredModels(), "Other"].map(model => (
+                    {/* {[...getFilteredModels(), "Other"].map(model => (
+                      <option key={model} value={model}>{model}</option>
+                    ))} */}
+                    {Array.from(new Set([...getFilteredModels(), "Other"])).map(model => (
                       <option key={model} value={model}>{model}</option>
                     ))}
                   </select>
@@ -454,22 +521,6 @@ const VehicleManagement = () => {
                       />
                     </div>
                   )}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Vehicle Type *</label>
-                  <select
-                    name="vehicleType"
-                    className="form-select"
-                    value={formData.vehicleType}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select Type</option>
-                    {vehicleTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
                 </div>
 
                 <div className="form-group">
