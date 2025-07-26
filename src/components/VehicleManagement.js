@@ -15,6 +15,11 @@ const VehicleManagement = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  //new use state for custom brand and model selection
+  const [customBrand, setCustomBrand] = useState('');
+  const [customModel, setCustomModel] = useState('');  
+  // //wheeler Type
+  // const [filterWheelerType, setFilterWheelerType] = useState('');
 
   const [formData, setFormData] = useState({
     registrationNumber: '',
@@ -26,13 +31,17 @@ const VehicleManagement = () => {
     hornDecibel: '',
     drivenBy: '',
     uses: '',
-    age: ''
+    age: '',
+    wheelerType: ''
   });
 
   const [editId, setEditId] = useState(null);
   const [formMode, setFormMode] = useState('add');
 
+  const types = ['2 Wheeler', '3 Wheeler', '4 Wheeler', '4+ Wheeler'];  //wheeler types
+
   const brands = ['Toyota', 'Honda', 'Maruti Suzuki', 'Hyundai', 'Mahindra', 'Tata', 'Ford', 'BMW', 'Mercedes', 'Audi', 'TVS', 'Force Motors', 'Ashok Leyland', 'Volvo', 'Bharat Benz'];
+  const [allBrands, setAllBrands] = useState([...brands]);
   const brandVehicleTypeMap = {
     'MCWG (Motor Cycle with Gear)': {
       'Honda': ['CB Shine', 'SP 125', 'Unicorn', 'Hornet', 'Hness CB350', 'Other'],
@@ -132,6 +141,30 @@ const VehicleManagement = () => {
     return brandModels;
   };
 
+//   // Utility function (OPTIONAL: for filtering based on the vehicle type to select wheeler type)
+// const getWheelerTypeFromVehicleType = (vehicleType) => {
+//   if (['MCWG (Motor Cycle with Gear)', 'MCWOG (Motor Cycle without Gear)'].includes(vehicleType)) return '2 Wheeler';
+//   if (['LMV (Light Motor Vehicle)', 'LMV-NT (Light Motor Vehicle – Non-Transport)', 'LMV-TR (Light Motor Vehicle – Transport)'].includes(vehicleType)) return '4 Wheeler';
+//   if (['TRANS (Transport Vehicle)', 'HMV (Heavy Motor Vehicle)'].includes(vehicleType)) return '4+ Wheeler';
+//   return '';
+// };
+
+// // Filtering logic
+// const filteredVehicles = vehicles.filter(vehicle => {
+//   const searchMatch =
+//     vehicle.registrationNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//     vehicle.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//     vehicle.model?.toLowerCase().includes(searchTerm.toLowerCase());
+
+//   const brandMatch = filterBrand ? vehicle.brand === filterBrand : true;
+//   const typeMatch = filterType ? vehicle.vehicleType === filterType : true;
+//   const wheelerMatch = filterWheelerType
+//     ? getWheelerTypeFromVehicleType(vehicle.vehicleType) === filterWheelerType
+//     : true;
+
+//   return searchMatch && brandMatch && typeMatch && wheelerMatch;
+// });
+
 
 
   useEffect(() => {
@@ -161,14 +194,44 @@ const VehicleManagement = () => {
       });
   }, []);
 
+  //OPTIONAL: to load brands from local storage (HERE WE NEED TO USE A BACKEND DATABASE)
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('brands'));
+    if (stored) {
+      setAllBrands(stored);
+    }
+  }, []);
+
   // Add/Edit submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
+    let finalBrand = formData.brand;
+    let finalModel = formData.model;
+
+    // Replace "Other" with custom input
+    if (formData.brand === "Other" && customBrand) {
+      finalBrand = customBrand;
+
+      // Add to dropdown list if not present already
+      if (!allBrands.includes(customBrand)) {
+        setAllBrands(prev => [...prev, customBrand]);
+
+        // Optionally persist to localStorage or backend
+        // localStorage.setItem('brands', JSON.stringify([...allBrands, customBrand]));
+        // TODO: Send POST request to backend to store new brand
+      }
+    }
+
+    if (formData.model === "Other" && customModel) {
+      finalModel = customModel;
+      // TODO: Save model for the vehicleType and brand in backend if needed
+    }
     const vehicleData = {
       registration_number: formData.registrationNumber,
       registration_date: formData.registrationDate,
-      brand: formData.brand,
-      model: formData.model,
+      brand: finalBrand,
+      model: finalModel,
+      wheeler_type: formData.wheelerType,  //optional if needed
       vehicle_type: formData.vehicleType,
       ownership: formData.ownership,
       horn_decibel: formData.hornDecibel,
@@ -182,7 +245,7 @@ const VehicleManagement = () => {
       setFormData({
         registrationNumber: '', registrationDate: '', brand: '', model: '',
         vehicleType: '', ownership: '', hornDecibel: '', drivenBy: '',
-        uses: '', age: ''
+        uses: '', age: '', wheelerType: ''
       });
       setShowForm(false);
     };
@@ -357,39 +420,57 @@ const VehicleManagement = () => {
                   />
                 </div>
 
+                {/* Here we changed this that when the user clicks other then there is a text box for entering the other brand */}
                 <div className="form-group">
                   <label className="form-label">Brand Name *</label>
                   <select
                     name="brand"
                     className="form-select"
                     value={formData.brand}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      setCustomBrand('');
+                    }}
                     required
                   >
                     <option value="">Select Brand</option>
-                    {brands.map(brand => (
+                    {[...allBrands, "Other"].map(brand => (
                       <option key={brand} value={brand}>{brand}</option>
                     ))}
                   </select>
+
+                  {formData.brand === "Other" && (
+                    <div style={{ marginTop: '0.8rem' }}>
+                      <input
+                        type="text"
+                        className="form-input mt-1"
+                        placeholder="Enter New Brand"
+                        value={customBrand}
+                        onChange={(e) => setCustomBrand(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
+                {/* Select Vehicle Wheeler Type  */}
                 <div className="form-group">
-                  <label className="form-label">Model Name *</label>
-                  {/* changed a bit select function to get the filter according to the vehicle brand and types */}
+                  <label className="form-label">Wheeler Type *</label>
                   <select
-                    name="model"
-                    value={formData.model}
+                    name="wheelerType"
                     className="form-select"
+                    value={formData.wheelerType || ''}
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="">Select Model</option>
-                    {getFilteredModels().map(model => (
-                      <option key={model} value={model}>{model}</option>
+                    <option value="">Select Wheeler</option>
+                    {types.map(type => (
+                      <option key={type} value={type}>{type}</option>
                     ))}
                   </select>
                 </div>
 
+                  {/* Select Vehicle Type */}
                 <div className="form-group">
                   <label className="form-label">Vehicle Type *</label>
                   <select
@@ -404,6 +485,42 @@ const VehicleManagement = () => {
                       <option key={type} value={type}>{type}</option>
                     ))}
                   </select>
+                </div>
+
+                  {/* Select Model Type*/}
+                <div className="form-group">
+                  <label className="form-label">Model Name *</label>
+                  <select
+                    name="model"
+                    value={formData.model}
+                    className="form-select"
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      setCustomModel('');
+                    }}
+                    required
+                  >
+                    <option value="">Select Model</option>
+                    {/* {[...getFilteredModels(), "Other"].map(model => (
+                      <option key={model} value={model}>{model}</option>
+                    ))} */}
+                    {Array.from(new Set([...getFilteredModels(), "Other"])).map(model => (
+                      <option key={model} value={model}>{model}</option>
+                    ))}
+                  </select>
+
+                  {formData.model === "Other" && (
+                    <div style={{ marginTop: '0.8rem' }}>
+                      <input
+                        type="text"
+                        className="form-input mt-1"
+                        placeholder="Enter New Model"
+                        value={customModel}
+                        onChange={(e) => setCustomModel(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">

@@ -76,14 +76,15 @@ const DriverDashboard = () => {
 
   //ocupation array
   const occupation = [
-    "State Transport Driver - Public Buses/Vehicles",
-    "Police Department Driver - Police Vans/Jeeps",
-    "Health Department Driver - Ambulances",
-    "Government Offices Driver - Offical Cars",
-    "Postal Department Driver - Mail Vans",
-    "Private Department Driver - Private Vehicles",
-    "Delivery Driver - Goods and Parcels Delivery",
-    "Professional Drivers - Commercial Buses, Trucks",
+    "State Transport Driver - Public Buses/Vehicles/Other",
+    "Police Department Driver - Police Vans/Jeeps/Truck/Other",
+    "Traffic Police Department Driver - Traffic Police Vans/Jeeps/Truck/Other",
+    "Health Department Driver - Ambulances/Other",
+    "Government Offices Driver - Offical Cars/Other",
+    "Postal Department Driver - Mail Vans/Other",
+    "Private Department Driver - Private Vehicles/Other",
+    "Delivery Driver - Goods and Parcels Delivery/Other",
+    "Professional Drivers - Commercial Buses, Trucks/Other",
     "Ride Share Drivers - Working for Ola, Uber, etc."
   ];
 
