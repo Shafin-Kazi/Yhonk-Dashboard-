@@ -383,25 +383,24 @@ const DriverManagement = () => {
 
   return (
     <div className="driver-management">
-      <div className="page-header">
-        <div className="header-content">
-          <h2 className="subtitle">Manage Drivers</h2>
-          <p className="subtitle">Register and manage driver information</p>
-        </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            setShowForm(true);
-            setEditId(null);
-          }}
-        >
-          <Plus size={16} />
-          Add Driver
-        </button>
-      </div>
-
       {/* Search and Filter */}
       <div className="search-filter-panel">
+        <div className="page-header">
+          <div className="page-header-text">
+            <h2 className="page-title">Manage Drivers</h2>
+            <p className="page-subtitle">Register and manage driver information</p>
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setShowForm(true);
+              setEditId(null);
+            }}
+          >
+            <Plus size={16} />
+            Add Driver
+          </button>
+        </div>
         <div className="search-box">
           <Search size={16} />
           <input

@@ -256,25 +256,24 @@ const DeviceManagement = () => {
 
   return (
     <div className="device-management">
-      <div className="page-header">
-        <div className="header-content">
-          <h2 className="subtitle">Manage Devices</h2>
-          <p className="subtitle">Register and manage Yhonk devices</p>
-        </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            setShowForm(true);
-            setEditId(null);
-          }}
-        >
-          <Plus size={16} />
-          Add Device
-        </button>
-      </div>
-
       {/* Search and Filter */}
       <div className="search-filter-panel">
+        <div className="page-header">
+          <div className="page-header-text">
+            <h2 className="page-title">Manage Devices</h2>
+            <p className="page-subtitle">Register and manage Yhonk devices</p>
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setShowForm(true);
+              setEditId(null);
+            }}
+          >
+            <Plus size={16} />
+            Add Device
+          </button>
+        </div>
         <div className="search-box">
           <Search size={16} />
           <input
