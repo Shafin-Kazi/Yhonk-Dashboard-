@@ -30,7 +30,7 @@ function App() {
           element={
             <div className="app">
               <Sidebar />
-              <div className="main-content" style={{ marginLeft: '16rem' }}>
+              <div className="main-content">
                 <header className="header">
                   <div className="header-content">
                     <h1>Yhonk Dashboard</h1>
